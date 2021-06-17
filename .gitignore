@@ -1,0 +1,11 @@
+.idea
+*.egg-info/
+.tox/
+.coverage*
+coverage.xml
+.*_cache
+__pycache__
+**.pyc
+build
+dist
+src/pytest_devpi/version.py
