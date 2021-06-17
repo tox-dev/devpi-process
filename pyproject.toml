@@ -7,10 +7,10 @@ line-length = 120
 
 [tool.isort]
 profile = "black"
-known_first_party = ["pytest_devpi"]
+known_first_party = ["devpi_process"]
 
 [tool.setuptools_scm]
-write_to = "src/pytest_devpi/version.py"
+write_to = "src/devpi_process/version.py"
 write_to_template = """
 \"\"\" Version information \"\"\"
 
