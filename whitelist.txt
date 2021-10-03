@@ -1,6 +1,3 @@
-INET
-Popen
-Runtime
 addfile
 cmd
 dedent
@@ -9,9 +6,12 @@ dirname
 exc
 exe
 getsockname
+inet
 mktemp
 pathlib
+popen
 readline
+runtime
 sdist
 sysconfig
 textwrap

@@ -2,7 +2,6 @@ import os
 import sys
 import tarfile
 from io import BytesIO
-from tempfile import NamedTemporaryFile
 from textwrap import dedent
 from typing import List, Optional
 from zipfile import ZipFile
