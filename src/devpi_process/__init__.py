@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import random
 import socket
 import string
@@ -8,13 +10,13 @@ from pathlib import Path
 from subprocess import PIPE, Popen, check_call
 from threading import Thread
 from types import TracebackType
-from typing import IO, Dict, Iterator, List, Optional, Sequence, Type, cast
+from typing import IO, Iterator, Sequence, cast
 
 from .version import __version__
 
 
 class Index:
-    def __init__(self, base_url: str, name: str, user: str, client_cmd_base: List[str]) -> None:
+    def __init__(self, base_url: str, name: str, user: str, client_cmd_base: list[str]) -> None:
         self._client_cmd_base = client_cmd_base
         self._server_url = base_url
         self.name = name
@@ -36,7 +38,7 @@ class Index:
 
 
 class IndexServer:
-    def __init__(self, path: Path, with_root_pypi: bool = False, start_args: Optional[Sequence[str]] = None) -> None:
+    def __init__(self, path: Path, with_root_pypi: bool = False, start_args: Sequence[str] | None = None) -> None:
         self.path = path
         self._with_root_pypi = with_root_pypi
         self._start_args: Sequence[str] = [] if start_args is None else start_args
@@ -57,16 +59,16 @@ class IndexServer:
 
         self._server_dir = self.path / "server"
         self._client_dir = self.path / "client"
-        self._indexes: Dict[str, Index] = {}
-        self._process: Optional["Popen[str]"] = None
+        self._indexes: dict[str, Index] = {}
+        self._process: Popen[str] | None = None
         self._has_use = False
-        self._stdout_drain: Optional[Thread] = None
+        self._stdout_drain: Thread | None = None
 
     @property
     def user(self) -> str:
         return "root"
 
-    def __enter__(self) -> "IndexServer":
+    def __enter__(self) -> IndexServer:
         self._create_and_start_server()
         self._setup_client()
         return self
@@ -124,9 +126,9 @@ class IndexServer:
 
     def __exit__(
         self,
-        exc_type: Optional[Type[BaseException]],  # noqa: U100
-        exc_val: Optional[BaseException],  # noqa: U100
-        exc_tb: Optional[TracebackType],  # noqa: U100
+        exc_type: type[BaseException] | None,  # noqa: U100
+        exc_val: BaseException | None,  # noqa: U100
+        exc_tb: TracebackType | None,  # noqa: U100
     ) -> None:
         if self._process is not None:  # pragma: no cover # defend against devpi startup fail
             self._process.terminate()

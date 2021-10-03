@@ -1,6 +1,7 @@
+from __future__ import annotations
+
 from importlib.util import module_from_spec, spec_from_file_location
 from pathlib import Path
-from typing import Tuple
 
 import pytest
 from _pytest.tmpdir import TempPathFactory
@@ -16,7 +17,7 @@ def test_version() -> None:
 
 
 @pytest.fixture(scope="session")
-def demo_artifacts(tmp_path_factory: TempPathFactory) -> Tuple[Path, Path]:
+def demo_artifacts(tmp_path_factory: TempPathFactory) -> tuple[Path, Path]:
     spec = spec_from_file_location("demo_pkg_inline.build", str(Path(__file__).parent / "demo_pkg_inline" / "build.py"))
     assert spec is not None
     build = module_from_spec(spec)
@@ -29,7 +30,7 @@ def demo_artifacts(tmp_path_factory: TempPathFactory) -> Tuple[Path, Path]:
     return wheel, sdist
 
 
-def test_create_server(tmp_path: Path, demo_artifacts: Tuple[Path, Path]) -> None:
+def test_create_server(tmp_path: Path, demo_artifacts: tuple[Path, Path]) -> None:
     with IndexServer(tmp_path) as server:
         assert repr(server)
         state = get(server.url).json()["result"]["root"]
