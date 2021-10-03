@@ -1,9 +1,10 @@
+from __future__ import annotations
+
 import os
 import sys
 import tarfile
 from io import BytesIO
 from textwrap import dedent
-from typing import List, Optional
 from zipfile import ZipFile
 
 name = "demo_pkg_inline"
@@ -55,7 +56,7 @@ content = {
 
 def build_wheel(
     wheel_directory: str,
-    metadata_directory: Optional[str] = None,  # noqa: U100
+    metadata_directory: str | None = None,  # noqa: U100
     config_settings: None = None,  # noqa: U100
 ) -> str:
     base_name = f"{name}-{version}-py{sys.version_info[0]}-none-any.whl"
@@ -68,7 +69,7 @@ def build_wheel(
 
 def get_requires_for_build_wheel(
     config_settings: None = None,  # noqa: U100
-) -> List[str]:
+) -> list[str]:
     return []  # pragma: no cover # only executed in non-host pythons
 
 
@@ -92,5 +93,5 @@ def build_sdist(
 
 def get_requires_for_build_sdist(
     config_settings: None = None,  # noqa: U100
-) -> List[str]:
+) -> list[str]:
     return []  # pragma: no cover # only executed in non-host pythons

@@ -28,8 +28,7 @@ jobs:
           - 3.9
           - 3.8
           - 3.7
-          - 3.6
-          - pypy3
+          - pypy-3.7-v7.3.5
     steps:
       - name: Setup python for tox
         uses: actions/setup-python@v2
@@ -47,7 +46,7 @@ jobs:
           import subprocess; import json; import os
           major, minor, impl = json.loads(subprocess.check_output(["python", "-c", "import json; import sys; import platform; print(json.dumps([sys.version_info[0], sys.version_info[1], platform.python_implementation()]));"], universal_newlines=True))
           with open(os.environ["GITHUB_ENV"], "a") as file_handler:
-                file_handler.write("TOXENV=" + (f'py{major}{minor}' if impl == "CPython" else f'pypy{major}') + "\n")
+                file_handler.write("TOXENV=" + (f'py{major}{minor}' if impl == "CPython" else f'pypy{major}{minor}') + "\n")
         shell: python
       - name: Setup test suite
         run: tox -vv --notest
