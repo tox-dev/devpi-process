@@ -23,10 +23,10 @@ def demo_artifacts(tmp_path_factory: TempPathFactory) -> tuple[Path, Path]:
     build = module_from_spec(spec)
     loader = spec.loader
     assert loader is not None
-    loader.exec_module(build)  # type: ignore
+    loader.exec_module(build)
     base = tmp_path_factory.mktemp("wheel")
-    wheel = base / build.build_wheel(str(base))  # type: ignore
-    sdist = base / build.build_sdist(str(base))  # type: ignore
+    wheel = base / build.build_wheel(str(base))
+    sdist = base / build.build_sdist(str(base))
     return wheel, sdist
 
 
@@ -53,7 +53,7 @@ def test_create_server(tmp_path: Path, demo_artifacts: tuple[Path, Path]) -> Non
         root = get(test.url).text
         assert "demo-pkg-inline" in root
 
-        pkg = get(f"{test.url}/demo-pkg-inline").text
+        pkg = get(f"{test.url}demo-pkg-inline/").text
         assert demo_artifacts[0].name in pkg
         assert demo_artifacts[1].name in pkg
 
@@ -67,4 +67,4 @@ def test_create_server_with_pypi(tmp_path: Path) -> None:
 def test_create_server_start_args(tmp_path: Path) -> None:
     with IndexServer(tmp_path, start_args=["--offline-mode"]) as server:
         assert server._process is not None
-        assert server._process.args[-1] == "--offline-mode"
+        assert server._process.args[-1] == "--offline-mode"  # type: ignore

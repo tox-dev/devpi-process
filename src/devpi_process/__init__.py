@@ -24,7 +24,7 @@ class Index:
 
     @property
     def url(self) -> str:
-        return f"{self._server_url}/{self.name}/+simple"
+        return f"{self._server_url}/{self.name}/+simple/"
 
     def use(self) -> None:
         check_call(self._client_cmd_base + ["use", f"{self.user}/{self.name}"], stdout=PIPE, stderr=PIPE)
@@ -51,7 +51,7 @@ class IndexServer:
             raise RuntimeError("could not get scripts folder of host interpreter")  # pragma: no cover
 
         def _exe(name: str) -> str:
-            return str(Path(cast(str, scripts_dir)) / f"{name}{'.exe' if sys.platform == 'win32' else ''}")
+            return str(Path(scripts_dir) / f"{name}{'.exe' if sys.platform == 'win32' else ''}")
 
         self._init: str = _exe("devpi-init")
         self._server: str = _exe("devpi-server")
