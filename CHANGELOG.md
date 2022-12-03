@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3 (2021-12-03)
+
+- Show stdout/stderr details if a command fails
+
 ## 0.2 (2021-12-29)
 
 - Drop 3.6 support and bump linters

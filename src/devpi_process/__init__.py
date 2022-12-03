@@ -7,12 +7,16 @@ import sys
 import sysconfig
 from contextlib import closing
 from pathlib import Path
-from subprocess import PIPE, Popen, check_call
+from subprocess import PIPE, Popen, run
 from threading import Thread
 from types import TracebackType
 from typing import IO, Iterator, Sequence, cast
 
 from .version import __version__
+
+
+def _check_call(cmd: list[str]) -> None:
+    run(cmd, check=True, stdout=PIPE, stderr=PIPE)
 
 
 class Index:
@@ -27,11 +31,11 @@ class Index:
         return f"{self._server_url}/{self.name}/+simple/"
 
     def use(self) -> None:
-        check_call(self._client_cmd_base + ["use", f"{self.user}/{self.name}"], stdout=PIPE, stderr=PIPE)
+        _check_call(self._client_cmd_base + ["use", f"{self.user}/{self.name}"])
 
     def upload(self, *files: Path) -> None:
         cmd = self._client_cmd_base + ["upload", "--index", self.name] + [str(i) for i in files]
-        check_call(cmd)
+        _check_call(cmd)
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}(url={self.url})"
@@ -81,7 +85,7 @@ class IndexServer:
         cmd.extend(("--role", "standalone", "--root-passwd", self._passwd))
         if self._with_root_pypi is False:
             cmd.append("--no-root-pypi")
-        check_call(cmd, stdout=PIPE, stderr=PIPE)
+        _check_call(cmd)
         # 2. start the server
         cmd = [self._server, "--serverdir", server_at, "--port", str(self.port)]
         cmd.extend(self._start_args)
@@ -112,14 +116,14 @@ class IndexServer:
         """create a user on the server and authenticate it"""
         self._client_dir.mkdir(exist_ok=True)
         base = ["--clientdir", str(self._client_dir)]
-        check_call([self._client, "use"] + base + [self.url], stdout=PIPE, stderr=PIPE)
-        check_call([self._client, "login"] + base + [self.user, "--password", self._passwd], stdout=PIPE, stderr=PIPE)
+        _check_call([self._client, "use"] + base + [self.url])
+        _check_call([self._client, "login"] + base + [self.user, "--password", self._passwd])
 
     def create_index(self, name: str, *args: str) -> Index:
         if name in self._indexes:  # pragma: no cover
             raise ValueError(f"index {name} already exists")
         base = [self._client, "--clientdir", str(self._client_dir)]
-        check_call(base + ["index", "-c", name, *args], stdout=PIPE, stderr=PIPE)
+        _check_call(base + ["index", "-c", name, *args])
         index = Index(f"{self.url}/{self.user}", name, self.user, base)
         self._indexes[name] = index
         return index
