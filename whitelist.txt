@@ -1,10 +1,17 @@
 addfile
+cmd
 devpi
+dirname
+exc
 exe
 getsockname
 inet
 mktemp
+popen
 readline
 sdist
 sysconfig
+tmp
 tmpdir
+util
+writestr

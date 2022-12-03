@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=65.5", "setuptools_scm>=7.0.5"]
+requires = ["setuptools>=65.6.3", "setuptools_scm>=7.0.5"]
 build-backend = 'setuptools.build_meta'
 
 [tool.black]
@@ -16,3 +16,16 @@ write_to_template = """
 
 __version__ = "{version}"
 """
+
+[tool.pep8]
+max-line-length = "120"
+
+[tool.flake8]
+max-complexity = 22
+max-line-length = 120
+unused-arguments-ignore-abstract-functions = true
+noqa-require-code = true
+dictionaries = ["en_US", "python", "technical", "django"]
+ignore = [
+  "E203", # whitespace before ':'
+]
