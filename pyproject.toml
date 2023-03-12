@@ -1,13 +1,9 @@
 [build-system]
-requires = ["setuptools>=67.6", "setuptools_scm>=7.1"]
 build-backend = 'setuptools.build_meta'
-
-[tool.black]
-line-length = 120
-
-[tool.isort]
-profile = "black"
-known_first_party = ["devpi_process"]
+requires = [
+  "setuptools>=67.6",
+  "setuptools_scm>=7.1",
+]
 
 [tool.setuptools_scm]
 write_to = "src/devpi_process/version.py"
@@ -17,8 +13,12 @@ write_to_template = """
 __version__ = "{version}"
 """
 
-[tool.pep8]
-max-line-length = "120"
+[tool.black]
+line-length = 120
+
+[tool.isort]
+profile = "black"
+known_first_party = ["devpi_process"]
 
 [tool.flake8]
 max-complexity = 22
@@ -29,3 +29,6 @@ dictionaries = ["en_US", "python", "technical", "django"]
 ignore = [
   "E203", # whitespace before ':'
 ]
+
+[tool.pep8]
+max-line-length = "120"
