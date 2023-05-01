@@ -12,7 +12,7 @@ from threading import Thread
 from types import TracebackType
 from typing import IO, Iterator, Sequence, cast
 
-from ._version import __version__
+from .version import __version__
 
 
 def _check_call(cmd: list[str]) -> None:
