@@ -12,11 +12,11 @@ from threading import Thread
 from types import TracebackType
 from typing import IO, Iterator, Sequence, cast
 
-from .version import __version__
+from ._version import __version__
 
 
 def _check_call(cmd: list[str]) -> None:
-    run(cmd, check=True, stdout=PIPE, stderr=PIPE)
+    run(cmd, check=True, capture_output=True)
 
 
 class Index:

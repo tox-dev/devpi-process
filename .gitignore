@@ -1,11 +1,7 @@
-.idea
-*.egg-info/
-.tox/
+/.tox
 .coverage*
 coverage.xml
 .*_cache
 __pycache__
 **.pyc
-build
-dist
-src/devpi_process/version.py
+src/devpi_process/_version.py
