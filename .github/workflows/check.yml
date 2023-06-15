@@ -24,7 +24,7 @@ jobs:
           - "3.8"
           - "3.7"
         os:
-          - ubuntu-22.04
+          - ubuntu-latest
           - windows-2022
           - macos-12
 
@@ -65,7 +65,7 @@ jobs:
       fail-fast: false
       matrix:
         os:
-          - ubuntu-22.04
+          - ubuntu-latest
           - windows-2022
         tox_env:
           - dev

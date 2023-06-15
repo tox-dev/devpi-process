@@ -1,3 +1,4 @@
+"""Devpi PyPI to test with."""
 from __future__ import annotations
 
 import random
@@ -9,18 +10,30 @@ from contextlib import closing
 from pathlib import Path
 from subprocess import PIPE, Popen, run
 from threading import Thread
-from types import TracebackType
-from typing import IO, Iterator, Sequence, cast
+from typing import IO, TYPE_CHECKING, Iterator, Sequence, cast
 
 from ._version import __version__
 
+if TYPE_CHECKING:
+    from types import TracebackType
+
 
 def _check_call(cmd: list[str]) -> None:
-    run(cmd, check=True, capture_output=True)
+    run(cmd, check=True, capture_output=True)  # noqa: S603
 
 
 class Index:
+    """Index."""
+
     def __init__(self, base_url: str, name: str, user: str, client_cmd_base: list[str]) -> None:
+        """
+        Create index.
+
+        :param base_url: base url
+        :param name: name for the index server
+        :param user: the username to use
+        :param client_cmd_base:
+        """
         self._client_cmd_base = client_cmd_base
         self._server_url = base_url
         self.name = name
@@ -28,31 +41,54 @@ class Index:
 
     @property
     def url(self) -> str:
+        """:return: the URL to the index server"""
         return f"{self._server_url}/{self.name}/+simple/"
 
     def use(self) -> None:
-        _check_call(self._client_cmd_base + ["use", f"{self.user}/{self.name}"])
+        """Use this index server."""
+        _check_call([*self._client_cmd_base, "use", f"{self.user}/{self.name}"])
 
     def upload(self, *files: Path) -> None:
+        """
+        Upload packages to the index.
+
+        :param files: the files to upload
+        """
         cmd = self._client_cmd_base + ["upload", "--index", self.name] + [str(i) for i in files]
         _check_call(cmd)
 
     def __repr__(self) -> str:
+        """:return: repr of the index"""
         return f"{self.__class__.__name__}(url={self.url})"
 
 
 class IndexServer:
-    def __init__(self, path: Path, with_root_pypi: bool = False, start_args: Sequence[str] | None = None) -> None:
+    """A PyPI index server locally."""
+
+    def __init__(
+        self,
+        path: Path,
+        with_root_pypi: bool = False,  # noqa: FBT001, FBT002
+        start_args: Sequence[str] | None = None,
+    ) -> None:
+        """
+        Create the local index server.
+
+        :param path: the path where to host files
+        :param with_root_pypi: access to upstream PyPI
+        :param start_args: additional arguments to start the server
+        """
         self.path = path
         self._with_root_pypi = with_root_pypi
         self._start_args: Sequence[str] = [] if start_args is None else start_args
 
         self.host, self.port = "localhost", _find_free_port()
-        self._passwd = "".join(random.choices(string.ascii_letters, k=8))
+        self._passwd = "".join(random.choices(string.ascii_letters, k=8))  # noqa: S311
 
         scripts_dir = sysconfig.get_path("scripts")
         if scripts_dir is None:
-            raise RuntimeError("could not get scripts folder of host interpreter")  # pragma: no cover
+            msg = "could not get scripts folder of host interpreter"  # pragma: no cover
+            raise RuntimeError(msg)  # pragma: no cover
 
         def _exe(name: str) -> str:
             return str(Path(scripts_dir) / f"{name}{'.exe' if sys.platform == 'win32' else ''}")
@@ -70,9 +106,11 @@ class IndexServer:
 
     @property
     def user(self) -> str:
+        """:return: username of the index server"""
         return "root"
 
     def __enter__(self) -> IndexServer:
+        """:return: start the index server"""
         self._create_and_start_server()
         self._setup_client()
         return self
@@ -89,7 +127,7 @@ class IndexServer:
         # 2. start the server
         cmd = [self._server, "--serverdir", server_at, "--port", str(self.port)]
         cmd.extend(self._start_args)
-        self._process = Popen(cmd, stdout=PIPE, universal_newlines=True)
+        self._process = Popen(cmd, stdout=PIPE, universal_newlines=True)  # noqa: S603
         stdout = self._drain_stdout()
         for line in stdout:  # pragma: no branch # will always loop at least once
             if "serving at url" in line:
@@ -108,32 +146,47 @@ class IndexServer:
         stdout = cast(IO[str], process.stdout)
         while True:
             if process.poll() is not None:  # pragma: no cover
-                print(f"devpi server with pid {process.pid} at {self._server_dir} died")
+                print(f"devpi server with pid {process.pid} at {self._server_dir} died")  # noqa: T201
                 break
             yield stdout.readline()
 
     def _setup_client(self) -> None:
-        """create a user on the server and authenticate it"""
+        """Create a user on the server and authenticate it."""
         self._client_dir.mkdir(exist_ok=True)
         base = ["--clientdir", str(self._client_dir)]
-        _check_call([self._client, "use"] + base + [self.url])
-        _check_call([self._client, "login"] + base + [self.user, "--password", self._passwd])
+        _check_call([self._client, "use", *base, self.url])
+        _check_call([self._client, "login", *base, self.user, "--password", self._passwd])
 
     def create_index(self, name: str, *args: str) -> Index:
+        """
+        Create an index on the server.
+
+        :param name: with name
+        :param args: additional arguments
+        :return: the created index
+        """
         if name in self._indexes:  # pragma: no cover
-            raise ValueError(f"index {name} already exists")
+            msg = f"index {name} already exists"
+            raise ValueError(msg)
         base = [self._client, "--clientdir", str(self._client_dir)]
-        _check_call(base + ["index", "-c", name, *args])
+        _check_call([*base, "index", "-c", name, *args])
         index = Index(f"{self.url}/{self.user}", name, self.user, base)
         self._indexes[name] = index
         return index
 
     def __exit__(
         self,
-        exc_type: type[BaseException] | None,  # noqa: U100
-        exc_val: BaseException | None,  # noqa: U100
-        exc_tb: TracebackType | None,  # noqa: U100
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: TracebackType | None,
     ) -> None:
+        """
+        Stop the index server.
+
+        :param exc_type:
+        :param exc_val:
+        :param exc_tb:
+        """
         if self._process is not None:  # pragma: no cover # defend against devpi startup fail
             self._process.terminate()
         if self._stdout_drain is not None and self._stdout_drain.is_alive():  # pragma: no cover # devpi startup fail
@@ -141,9 +194,11 @@ class IndexServer:
 
     @property
     def url(self) -> str:
+        """:return: url to the index server"""
         return f"http://{self.host}:{self.port}"
 
     def __repr__(self) -> str:
+        """:return: repr of the index server"""
         return f"{self.__class__.__name__}(url={self.url}, indexes={list(self._indexes)})"
 
 
