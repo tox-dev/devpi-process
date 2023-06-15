@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-import os
 import sys
 import tarfile
 from io import BytesIO
+from pathlib import Path
 from textwrap import dedent
 from zipfile import ZipFile
 
@@ -31,7 +31,8 @@ content = {
 
         UNKNOWN
        """.format(
-        pkg_name, version
+        pkg_name,
+        version,
     ),
     wheel: """
         Wheel-Version: 1.0
@@ -39,7 +40,9 @@ content = {
         Root-Is-Purelib: true
         Tag: py{}-none-any
        """.format(
-        name, version, sys.version_info[0]
+        name,
+        version,
+        sys.version_info[0],
     ),
     f"{dist_info}/top_level.txt": name,
     record: """
@@ -49,39 +52,40 @@ content = {
         {1}/top_level.txt,,
         {1}/RECORD,,
        """.format(
-        name, dist_info
+        name,
+        dist_info,
     ),
 }
 
 
 def build_wheel(
     wheel_directory: str,
-    metadata_directory: str | None = None,  # noqa: U100
-    config_settings: None = None,  # noqa: U100
+    metadata_directory: str | None = None,  # noqa: ARG001
+    config_settings: None = None,  # noqa: ARG001
 ) -> str:
     base_name = f"{name}-{version}-py{sys.version_info[0]}-none-any.whl"
-    path = os.path.join(wheel_directory, base_name)
-    with ZipFile(path, "w") as zip_file_handler:
+    path = Path(wheel_directory) / base_name
+    with ZipFile(str(path), "w") as zip_file_handler:
         for arc_name, data in content.items():  # pragma: no branch
             zip_file_handler.writestr(arc_name, dedent(data).strip())
     return base_name
 
 
 def get_requires_for_build_wheel(
-    config_settings: None = None,  # noqa: U100
+    config_settings: None = None,  # noqa: ARG001
 ) -> list[str]:
     return []  # pragma: no cover # only executed in non-host pythons
 
 
 def build_sdist(
     sdist_directory: str,
-    config_settings: None = None,  # noqa: U100
+    config_settings: None = None,  # noqa: ARG001
 ) -> str:
     result = f"{name}-{version}.tar.gz"
-    with tarfile.open(os.path.join(sdist_directory, result), "w:gz") as tar:
-        root = os.path.dirname(os.path.abspath(__file__))
-        tar.add(os.path.join(root, "build.py"), "build.py")
-        tar.add(os.path.join(root, "pyproject.toml"), "pyproject.toml")
+    with tarfile.open(str(Path(sdist_directory) / result), "w:gz") as tar:
+        root = Path(__file__).parent
+        tar.add(str(root / "build.py"), "build.py")
+        tar.add(str(root / "pyproject.toml"), "pyproject.toml")
 
         pkg_info = dedent(content[metadata]).strip().encode("utf-8")
         info = tarfile.TarInfo("PKG-INFO")
@@ -92,6 +96,6 @@ def build_sdist(
 
 
 def get_requires_for_build_sdist(
-    config_settings: None = None,  # noqa: U100
+    config_settings: None = None,  # noqa: ARG001
 ) -> list[str]:
     return []  # pragma: no cover # only executed in non-host pythons

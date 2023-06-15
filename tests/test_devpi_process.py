@@ -2,12 +2,15 @@ from __future__ import annotations
 
 from importlib.util import module_from_spec, spec_from_file_location
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import pytest
-from _pytest.tmpdir import TempPathFactory
 from httpx import get
 
 from devpi_process import IndexServer
+
+if TYPE_CHECKING:
+    from _pytest.tmpdir import TempPathFactory
 
 
 def test_version() -> None:
@@ -66,5 +69,5 @@ def test_create_server_with_pypi(tmp_path: Path) -> None:
 
 def test_create_server_start_args(tmp_path: Path) -> None:
     with IndexServer(tmp_path, start_args=["--offline-mode"]) as server:
-        assert server._process is not None
-        assert server._process.args[-1] == "--offline-mode"  # type: ignore
+        assert server._process is not None  # noqa: SLF001
+        assert server._process.args[-1] == "--offline-mode"  # type: ignore[index] # noqa: SLF001
