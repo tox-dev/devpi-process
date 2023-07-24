@@ -18,10 +18,10 @@ wheel = f"{dist_info}/WHEEL"
 record = f"{dist_info}/RECORD"
 content = {
     logic: f"def do():\n    print('greetings from {name}')",
-    metadata: """
+    metadata: f"""
         Metadata-Version: 2.1
-        Name: {}
-        Version: {}
+        Name: {pkg_name}
+        Version: {version}
         Summary: UNKNOWN
         Home-page: UNKNOWN
         Author: UNKNOWN
@@ -30,20 +30,13 @@ content = {
         Platform: UNKNOWN
 
         UNKNOWN
-       """.format(
-        pkg_name,
-        version,
-    ),
-    wheel: """
+       """,
+    wheel: f"""
         Wheel-Version: 1.0
-        Generator: {}-{}
+        Generator: {name}-{version}
         Root-Is-Purelib: true
-        Tag: py{}-none-any
-       """.format(
-        name,
-        version,
-        sys.version_info[0],
-    ),
+        Tag: py{sys.version_info[0]}-none-any
+       """,
     f"{dist_info}/top_level.txt": name,
     record: """
         {0}/__init__.py,,
