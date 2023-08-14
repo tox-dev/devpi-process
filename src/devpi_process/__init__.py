@@ -17,6 +17,11 @@ from ._version import __version__
 if TYPE_CHECKING:
     from types import TracebackType
 
+    if sys.version_info >= (3, 11):  # pragma: no cover (py311+)
+        from typing import Self
+    else:  # pragma: no cover (<py311)
+        from typing_extensions import Self
+
 
 def _check_call(cmd: list[str]) -> None:
     run(cmd, check=True, capture_output=True)  # noqa: S603
@@ -109,7 +114,7 @@ class IndexServer:
         """:return: username of the index server"""
         return "root"
 
-    def __enter__(self) -> IndexServer:
+    def __enter__(self) -> Self:
         """:return: start the index server"""
         self._create_and_start_server()
         self._setup_client()
