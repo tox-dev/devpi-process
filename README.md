@@ -3,7 +3,7 @@
 [![PyPI](https://img.shields.io/pypi/v/devpi-process?style=flat-square)](https://pypi.org/project/devpi-process)
 [![PyPI - Implementation](https://img.shields.io/pypi/implementation/devpi-process?style=flat-square)](https://pypi.org/project/devpi-process)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/devpi-process?style=flat-square)](https://pypi.org/project/devpi-process)
-[![PyPI - Downloads](https://img.shields.io/pypi/dm/devpi-process?style=flat-square)](https://pypistats.org/packages/devpi-process)
+[![Downloads](https://static.pepy.tech/badge/devpi-process/month)](https://pepy.tech/project/devpi-process)
 [![PyPI - License](https://img.shields.io/pypi/l/devpi-process?style=flat-square)](https://opensource.org/licenses/MIT)
 [![check](https://github.com/tox-dev/devpi-process/workflows/check/badge.svg)](https://github.com/tox-dev/devpi-process/actions?query=workflow%3Acheck)
 [![Code style:
