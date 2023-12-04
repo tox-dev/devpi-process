@@ -9,7 +9,7 @@ import sys
 import sysconfig
 from contextlib import closing
 from pathlib import Path
-from subprocess import PIPE, Popen, run
+from subprocess import PIPE, Popen, run  # noqa: S404
 from threading import Thread
 from typing import IO, TYPE_CHECKING, Iterator, Sequence, cast
 
@@ -215,7 +215,7 @@ def _find_free_port() -> int:
 
 
 __all__ = [
-    "__version__",
     "Index",
     "IndexServer",
+    "__version__",
 ]

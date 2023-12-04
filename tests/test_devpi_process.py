@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 
 
 def test_version() -> None:
-    import devpi_process
+    import devpi_process  # noqa: PLC0415
 
     assert devpi_process.__version__ is not None
 
