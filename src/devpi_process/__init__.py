@@ -1,4 +1,5 @@
 """Devpi PyPI to test with."""
+
 from __future__ import annotations
 
 import random
