@@ -17,8 +17,12 @@ keywords = [
   "virtual",
 ]
 license = "MIT"
-maintainers = [{ name = "Bernát Gábor", email = "gaborjbernat@gmail.com" }]
-authors = [{ name = "Bernát Gábor", email = "gaborjbernat@gmail.com" }]
+maintainers = [
+  { name = "Bernát Gábor", email = "gaborjbernat@gmail.com" },
+]
+authors = [
+  { name = "Bernát Gábor", email = "gaborjbernat@gmail.com" },
+]
 requires-python = ">=3.8"
 classifiers = [
   "Development Status :: 5 - Production/Stable",
@@ -44,7 +48,7 @@ dynamic = [
 dependencies = [
   "devpi-client>=7.0.2",
   "devpi-server>=6.10",
-  'typing-extensions>=4.9; python_version < "3.11"',
+  "typing-extensions>=4.9; python_version<'3.11'",
 ]
 optional-dependencies.test = [
   "covdefaults>=2.3",
@@ -66,8 +70,14 @@ line-length = 120
 [tool.ruff]
 line-length = 120
 target-version = "py38"
-lint.isort = { known-first-party = ["devpi_process"], required-imports = ["from __future__ import annotations"] }
-lint.select = ["ALL"]
+lint.isort = { known-first-party = [
+  "devpi_process",
+], required-imports = [
+  "from __future__ import annotations",
+] }
+lint.select = [
+  "ALL",
+]
 lint.ignore = [
   "ANN101", # no type annotation for self
   "ANN401", # allow Any as type annotation
@@ -109,9 +119,12 @@ paths.source = [
   "*\\src",
 ]
 report.fail_under = 98
-report.omit = []
+report.omit = [
+]
 run.parallel = true
-run.plugins = ["covdefaults"]
+run.plugins = [
+  "covdefaults",
+]
 
 [tool.mypy]
 python_version = "3.11"
