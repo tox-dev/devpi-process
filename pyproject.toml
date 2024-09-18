@@ -51,7 +51,7 @@ dependencies = [
   "devpi-server>=6.12.1",
   "typing-extensions>=4.12.2; python_version<'3.11'",
 ]
-optional-dependencies.test = [
+optional-dependencies.testing = [
   "covdefaults>=2.3",
   "httpx>=0.27.2",
   "pytest>=8.3.2",
