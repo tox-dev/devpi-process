@@ -149,7 +149,7 @@ class IndexServer:
 
     def _drain_stdout(self) -> Iterator[str]:
         process = cast("Popen[str]", self._process)
-        stdout = cast(IO[str], process.stdout)
+        stdout = cast("IO[str]", process.stdout)
         while True:
             if process.poll() is not None:  # pragma: no cover
                 print(f"devpi server with pid {process.pid} at {self._server_dir} died")  # noqa: T201
@@ -211,7 +211,7 @@ class IndexServer:
 def _find_free_port() -> int:
     with closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as socket_handler:
         socket_handler.bind(("", 0))
-        return cast(int, socket_handler.getsockname()[1])
+        return cast("int", socket_handler.getsockname()[1])
 
 
 __all__ = [
