@@ -11,11 +11,12 @@ from contextlib import closing
 from pathlib import Path
 from subprocess import PIPE, Popen, run  # noqa: S404
 from threading import Thread
-from typing import IO, TYPE_CHECKING, Iterator, Sequence, cast
+from typing import IO, TYPE_CHECKING, cast
 
 from ._version import __version__
 
 if TYPE_CHECKING:
+    from collections.abc import Iterator, Sequence
     from types import TracebackType
 
     if sys.version_info >= (3, 11):  # pragma: no cover (py311+)
