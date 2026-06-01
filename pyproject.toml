@@ -81,8 +81,8 @@ pkg-meta = [
 ]
 
 [tool.hatch]
-build.hooks.vcs.version-file = "src/devpi_process/_version.py"
 version.source = "vcs"
+build.hooks.vcs.version-file = "src/devpi_process/_version.py"
 
 [tool.black]
 line-length = 120
