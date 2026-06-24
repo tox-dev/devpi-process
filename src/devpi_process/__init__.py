@@ -48,7 +48,7 @@ class Index:
 
     @property
     def url(self) -> str:
-        """:return: the URL to the index server"""
+        """The URL to the index server."""
         return f"{self._server_url}/{self.name}/+simple/"
 
     def use(self) -> None:
@@ -113,7 +113,7 @@ class IndexServer:
 
     @property
     def user(self) -> str:
-        """:return: username of the index server"""
+        """Username of the index server."""
         return "root"
 
     def __enter__(self) -> Self:
@@ -201,7 +201,7 @@ class IndexServer:
 
     @property
     def url(self) -> str:
-        """:return: url to the index server"""
+        """URL to the index server."""
         return f"http://{self.host}:{self.port}"
 
     def __repr__(self) -> str:
