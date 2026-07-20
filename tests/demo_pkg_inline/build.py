@@ -50,8 +50,8 @@ content = {
 
 def build_wheel(
     wheel_directory: str,
-    metadata_directory: str | None = None,  # noqa: ARG001
-    config_settings: None = None,  # noqa: ARG001
+    metadata_directory: str | None = None,  # ruff:ignore[unused-function-argument]
+    config_settings: None = None,  # ruff:ignore[unused-function-argument]
 ) -> str:
     base_name = f"{name}-{version}-py{sys.version_info[0]}-none-any.whl"
     path = Path(wheel_directory) / base_name
@@ -62,14 +62,14 @@ def build_wheel(
 
 
 def get_requires_for_build_wheel(
-    config_settings: None = None,  # noqa: ARG001
+    config_settings: None = None,  # ruff:ignore[unused-function-argument]
 ) -> list[str]:
     return []  # pragma: no cover # only executed in non-host pythons
 
 
 def build_sdist(
     sdist_directory: str,
-    config_settings: None = None,  # noqa: ARG001
+    config_settings: None = None,  # ruff:ignore[unused-function-argument]
 ) -> str:
     result = f"{name}-{version}.tar.gz"
     with tarfile.open(str(Path(sdist_directory) / result), "w:gz") as tar:
@@ -86,6 +86,6 @@ def build_sdist(
 
 
 def get_requires_for_build_sdist(
-    config_settings: None = None,  # noqa: ARG001
+    config_settings: None = None,  # ruff:ignore[unused-function-argument]
 ) -> list[str]:
     return []  # pragma: no cover # only executed in non-host pythons

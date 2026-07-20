@@ -9,7 +9,7 @@ import sys
 import sysconfig
 from contextlib import closing
 from pathlib import Path
-from subprocess import PIPE, Popen, run  # noqa: S404
+from subprocess import PIPE, Popen, run  # ruff:ignore[suspicious-subprocess-import]
 from threading import Thread
 from typing import IO, TYPE_CHECKING, cast
 
@@ -26,7 +26,7 @@ if TYPE_CHECKING:
 
 
 def _check_call(cmd: list[str]) -> None:
-    run(cmd, check=True, capture_output=True)  # noqa: S603
+    run(cmd, check=True, capture_output=True)  # ruff:ignore[subprocess-without-shell-equals-true]
 
 
 class Index:
@@ -75,7 +75,7 @@ class IndexServer:
     def __init__(
         self,
         path: Path,
-        with_root_pypi: bool = False,  # noqa: FBT001, FBT002
+        with_root_pypi: bool = False,  # ruff:ignore[boolean-type-hint-positional-argument, boolean-default-value-positional-argument]
         start_args: Sequence[str] | None = None,
     ) -> None:
         """
@@ -90,7 +90,7 @@ class IndexServer:
         self._start_args: Sequence[str] = [] if start_args is None else start_args
 
         self.host, self.port = "localhost", _find_free_port()
-        self._passwd = "".join(random.choices(string.ascii_letters, k=8))  # noqa: S311
+        self._passwd = "".join(random.choices(string.ascii_letters, k=8))  # ruff:ignore[suspicious-non-cryptographic-random-usage]
 
         scripts_dir = sysconfig.get_path("scripts")
         if scripts_dir is None:
@@ -134,7 +134,7 @@ class IndexServer:
         # 2. start the server
         cmd = [self._server, "--serverdir", server_at, "--port", str(self.port)]
         cmd.extend(self._start_args)
-        self._process = Popen(cmd, stdout=PIPE, universal_newlines=True)  # noqa: S603
+        self._process = Popen(cmd, stdout=PIPE, universal_newlines=True)  # ruff:ignore[subprocess-without-shell-equals-true]
         stdout = self._drain_stdout()
         for line in stdout:  # pragma: no branch # will always loop at least once
             if "serving at url" in line:
@@ -153,7 +153,7 @@ class IndexServer:
         stdout = cast("IO[str]", process.stdout)
         while True:
             if process.poll() is not None:  # pragma: no cover
-                print(f"devpi server with pid {process.pid} at {self._server_dir} died")  # noqa: T201
+                print(f"devpi server with pid {process.pid} at {self._server_dir} died")  # ruff:ignore[print]
                 break
             yield stdout.readline()
 

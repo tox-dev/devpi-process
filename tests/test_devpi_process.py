@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 
 
 def test_version() -> None:
-    import devpi_process  # noqa: PLC0415
+    import devpi_process  # ruff:ignore[import-outside-top-level]
 
     assert devpi_process.__version__ is not None
 
@@ -69,7 +69,7 @@ def test_create_server_with_pypi(tmp_path: Path) -> None:
 
 def test_create_server_start_args(tmp_path: Path) -> None:
     with IndexServer(tmp_path, start_args=["--offline-mode"]) as server:
-        assert server._process is not None  # noqa: SLF001
-        args = server._process.args  # noqa: SLF001
+        assert server._process is not None  # ruff:ignore[private-member-access]
+        args = server._process.args  # ruff:ignore[private-member-access]
         assert isinstance(args, list)
         assert args[-1] == "--offline-mode"
