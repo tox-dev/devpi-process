@@ -8,7 +8,6 @@
 
 - Publish a GitHub Release with the tagged changelog after each PyPI upload. (#290)
 
-
 ## 1.3.0 (2026-10-10)
 
 - Require Python 3.11 and use Python 3.15 by default ([#284](https://github.com/tox-dev/devpi-process/pull/284)).
