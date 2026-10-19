@@ -1,7 +1,7 @@
 name: Label maintenance PRs
 on:
   workflow_run: # zizmor: ignore[dangerous-triggers] Reads PR metadata without checkout, artifacts, caches, or PR code.
-    workflows: ["🧪 check"]
+    workflows: ["check"]
     types: [completed]
 permissions:
   contents: read

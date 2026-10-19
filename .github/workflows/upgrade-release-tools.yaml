@@ -111,17 +111,17 @@ jobs:
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -m "🔧 build(deps): refresh release lock"
+          git commit -m "build(deps): refresh release lock"
           gh auth setup-git --hostname github.com --force
           git push --force origin "HEAD:$BRANCH"
           cat > "$RUNNER_TEMP/pull-request.md" <<'EOF'
-          🔧 Refresh the locked release tools to the latest versions allowed by the `release` dependency group.
+          Refresh the locked release tools to the latest versions allowed by the `release` dependency group.
           `pylock.toml` records the exact versions used by release and changelog workflows.
           EOF
           pr_number=$(gh pr list --base main --head "$BRANCH" --state open --json number --jq '.[0].number')
           if [[ -n "$pr_number" ]]; then
             gh pr edit "$pr_number" \
-              --title "🔧 build(deps): refresh release tool lock" \
+              --title "build(deps): refresh release tool lock" \
               --body-file "$RUNNER_TEMP/pull-request.md" \
               --add-label dependencies \
               --add-label "skip news"
@@ -129,7 +129,7 @@ jobs:
             gh pr create \
               --base main \
               --head "$BRANCH" \
-              --title "🔧 build(deps): refresh release tool lock" \
+              --title "build(deps): refresh release tool lock" \
               --body-file "$RUNNER_TEMP/pull-request.md" \
               --label dependencies \
               --label "skip news"
