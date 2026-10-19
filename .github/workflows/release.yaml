@@ -10,32 +10,47 @@ jobs:
   build:
     runs-on: ubuntu-26.04
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: 📥 Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
           persist-credentials: false
+      - name: 🚀 Install the latest version of uv
+        uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
+        with:
+          python-version: "3.15"
+          cache-dependency-glob: "pyproject.toml"
+          enable-cache: false
+      - name: 📦 Install locked release tools
+        run: |
+          uv venv --python 3.15 "$RUNNER_TEMP/release-tools"
+          uv pip sync --preview-features pylock --python "$RUNNER_TEMP/release-tools/bin/python" --group release pylock.toml
+          echo "$RUNNER_TEMP/release-tools/bin" >> "$GITHUB_PATH"
       - name: Require a changelog section for the tag
         env:
           TAG: ${{ github.ref_name }}
         run: |
-          if [[ ! "$TAG" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            echo "::error::unexpected release tag $TAG"
-            exit 1
-          fi
+          set -euo pipefail
+          release-creator tags "$TAG"
           if ! grep -qF "## $TAG (" CHANGELOG.md; then
             echo "::error::CHANGELOG.md has no section for $TAG"
             exit 1
           fi
-      - name: Install the latest version of uv
-        uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
-        with:
-          python-version: "3.15"
-          enable-cache: false
-          cache-dependency-glob: "pyproject.toml"
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Build package
+          previous=$(git tag --list | release-creator tags "$TAG" --previous)
+          args=()
+          if [[ -n "$previous" ]]; then
+            args+=(--previous "$previous")
+          fi
+          release-creator notes \
+            --changelog CHANGELOG.md \
+            --tag "$TAG" \
+            --repository "$GITHUB_REPOSITORY" \
+            --artifact-url "https://pypi.org/project/devpi-process/${TAG}/" \
+            "${args[@]}" > "$RUNNER_TEMP/release-notes.md"
+          test "$(grep -c '^\*\*Full Changelog\*\*:' "$RUNNER_TEMP/release-notes.md")" -eq 1
+      - name: 📦 Build package
         run: uv build --python 3.15 --python-preference only-managed --sdist --wheel . --out-dir dist
-      - name: Store the distribution packages
+      - name: 📤 Store the distribution packages
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: ${{ env.dists-artifact-name }}
@@ -50,12 +65,12 @@ jobs:
     permissions:
       id-token: write
     steps:
-      - name: Download all the dists
+      - name: 📥 Download all the dists
         uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: ${{ env.dists-artifact-name }}
           path: dist/
-      - name: Publish to PyPI
+      - name: 🚀 Publish to PyPI
         uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2
         with:
           attestations: true
@@ -69,19 +84,39 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
+      - uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
+        with:
+          python-version: "3.15"
+          enable-cache: false
+      - name: 📦 Install locked release tools
+        run: |
+          uv venv --python 3.15 "$RUNNER_TEMP/release-tools"
+          uv pip sync --preview-features pylock --python "$RUNNER_TEMP/release-tools/bin/python" --group release pylock.toml
+          echo "$RUNNER_TEMP/release-tools/bin" >> "$GITHUB_PATH"
       - name: Publish GitHub Release
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ github.ref_name }}
         run: |
           set -euo pipefail
-          awk -v tag="$TAG" 'index($0, "## " tag " (") == 1 { found = 1; next } found && /^## / { exit } found { print }' CHANGELOG.md > "$RUNNER_TEMP/release-notes.md"
-          test -s "$RUNNER_TEMP/release-notes.md"
-          printf '\n[PyPI release](https://pypi.org/project/devpi-process/%s/)\n' "$TAG" >> "$RUNNER_TEMP/release-notes.md"
-          previous=$(git tag --list '[0-9]*' | grep -E '^[0-9]+(\.[0-9]+){1,2}$' | sort -V | awk -v tag="$TAG" '$0 == tag { print previous; exit } { previous = $0 }')
+          previous=$(git tag --list | release-creator tags "$TAG" --previous)
+          args=()
           if [[ -n "$previous" ]]; then
-            printf '\n**Full Changelog**: https://github.com/%s/compare/%s...%s\n' "$GITHUB_REPOSITORY" "$previous" "$TAG" >> "$RUNNER_TEMP/release-notes.md"
+            args+=(--previous "$previous")
+            gh api -X POST "repos/${GITHUB_REPOSITORY}/releases/generate-notes" \
+              -f tag_name="$TAG" \
+              -f previous_tag_name="$previous" \
+              --jq .body > "$RUNNER_TEMP/generated-notes.md"
           else
-            printf '\n**Full Changelog**: https://github.com/%s/commits/%s\n' "$GITHUB_REPOSITORY" "$TAG" >> "$RUNNER_TEMP/release-notes.md"
+            gh api -X POST "repos/${GITHUB_REPOSITORY}/releases/generate-notes" \
+              -f tag_name="$TAG" \
+              --jq .body > "$RUNNER_TEMP/generated-notes.md"
           fi
-          gh release create "$TAG" --verify-tag --title "$TAG" --notes-file "$RUNNER_TEMP/release-notes.md"
+          release-creator notes \
+            --changelog CHANGELOG.md \
+            --tag "$TAG" \
+            --repository "$GITHUB_REPOSITORY" \
+            --artifact-url "https://pypi.org/project/devpi-process/${TAG}/" \
+            --generated-notes "$RUNNER_TEMP/generated-notes.md" \
+            "${args[@]}" > "$RUNNER_TEMP/release-notes.md"
+          gh release create "$TAG" --verify-tag --title "v$TAG" --notes-file "$RUNNER_TEMP/release-notes.md"

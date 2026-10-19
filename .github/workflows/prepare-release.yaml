@@ -2,9 +2,17 @@ name: Prepare release
 on:
   workflow_dispatch:
     inputs:
-      version:
-        description: Version to release, without a v prefix
+      bump:
+        description: Version bump type
         required: true
+        type: choice
+        options:
+          - auto
+          - major
+          - minor
+          - patch
+          - calver
+        default: auto
 permissions: {}
 concurrency:
   group: prepare-release
@@ -15,6 +23,9 @@ jobs:
     runs-on: ubuntu-26.04
     permissions:
       contents: read
+      pull-requests: read
+    outputs:
+      version: ${{ steps.version.outputs.version }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -24,26 +35,31 @@ jobs:
         with:
           python-version: "3.15"
           enable-cache: false
-      - name: Build release patch
+      - name: 📦 Install locked release tools
+        run: |
+          uv venv --python 3.15 "$RUNNER_TEMP/release-tools"
+          uv pip sync --preview-features pylock --python "$RUNNER_TEMP/release-tools/bin/python" --group release pylock.toml
+          echo "$RUNNER_TEMP/release-tools/bin" >> "$GITHUB_PATH"
+      - name: Calculate next version
+        id: version
         env:
-          VERSION: ${{ inputs.version }}
+          BUMP: ${{ inputs.bump }}
         run: |
           set -euo pipefail
-          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            echo "::error::expected a major.minor.patch version"
-            exit 1
-          fi
-          latest=$(git tag --list '[0-9]*' | sort -V | tail -n 1)
-          if [[ "$(printf '%s\n' "$latest" "$VERSION" | sort -V | tail -n 1)" != "$VERSION" || "$latest" == "$VERSION" ]]; then
-            echo "::error::$VERSION must be newer than $latest"
-            exit 1
-          fi
-          if ! compgen -G 'changelog.d/*.md' > /dev/null; then
-            echo "::error::no changelog fragments to release"
-            exit 1
-          fi
-          uvx towncrier build --yes --version "$VERSION"
-          uvx prek run --all-files --show-diff-on-failure || uvx prek run --all-files --show-diff-on-failure
+          version=$(git tag --list | release-creator tags --next "$BUMP")
+          echo "Next version: $version"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+      - name: Build release patch
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          set -euo pipefail
+          git tag --list | release-creator tags "$VERSION" --require-newer
+          release-creator fragments --repository "$GITHUB_REPOSITORY" --git --resolve-authors
+          towncrier build --yes --version "$VERSION"
+          mdformat --wrap 120 CHANGELOG.md
+          prek run --all-files
           unexpected=$(
             while IFS= read -r entry; do
               path=${entry:3}
@@ -51,7 +67,7 @@ jobs:
                 CHANGELOG.md|changelog.d/*.md) ;;
                 *) printf '%s\n' "$path" ;;
               esac
-            done < <(git status --short --untracked-files=all)
+            done < <(git status --porcelain=v1 --untracked-files=all)
           )
           if [[ -n "$unexpected" ]]; then
             echo "::error::release preparation changed paths outside CHANGELOG.md and changelog.d"
@@ -59,6 +75,7 @@ jobs:
             exit 1
           fi
           grep -Fq "## $VERSION (" CHANGELOG.md
+          release-creator notes --changelog CHANGELOG.md --tag "$VERSION" --repository "$GITHUB_REPOSITORY" > "$RUNNER_TEMP/release-notes.md"
           git diff HEAD --check
           git diff HEAD --binary > "$RUNNER_TEMP/release.patch"
           test -s "$RUNNER_TEMP/release.patch"
@@ -82,12 +99,20 @@ jobs:
         with:
           name: release-patch
           path: ${{ runner.temp }}/release-patch
+      - uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
+        with:
+          python-version: "3.15"
+          enable-cache: false
       - name: Validate release patch
         env:
-          VERSION: ${{ inputs.version }}
+          VERSION: ${{ needs.assemble.outputs.version }}
         run: |
           set -euo pipefail
           git fetch origin main
+          if [[ $(git rev-parse origin/main) != "$GITHUB_SHA" ]]; then
+            echo "::error::main changed during release preparation; dispatch again"
+            exit 1
+          fi
           git reset --hard origin/main
           git apply --check "$RUNNER_TEMP/release-patch/release.patch"
           git apply --index "$RUNNER_TEMP/release-patch/release.patch"
@@ -99,12 +124,11 @@ jobs:
           done < <(git diff --cached --name-only)
           grep -Fq "## $VERSION (" CHANGELOG.md
           git diff --cached --check
-      - name: Check the release tree before authentication
-        run: |
-          set -euo pipefail
-          uvx prek run --all-files --show-diff-on-failure || uvx prek run --all-files --show-diff-on-failure
+          uv venv --python 3.15 "$RUNNER_TEMP/release-tools"
+          uv pip sync --preview-features pylock --python "$RUNNER_TEMP/release-tools/bin/python" --group release pylock.toml
+          "$RUNNER_TEMP/release-tools/bin/prek" run --all-files
           if ! git diff --quiet || [[ -n $(git ls-files --others --exclude-standard) ]]; then
-            echo "::error::prek changed the validated release patch; inspect the generated changelog and rerun"
+            echo "::error::prek changed the validated release patch"
             exit 1
           fi
       - id: token
@@ -117,7 +141,7 @@ jobs:
           permission-contents: write
       - name: Commit and tag the release
         env:
-          VERSION: ${{ inputs.version }}
+          VERSION: ${{ needs.assemble.outputs.version }}
           GH_TOKEN: ${{ steps.token.outputs.token }}
           APP_SLUG: ${{ steps.token.outputs.app-slug }}
         run: |
@@ -125,7 +149,7 @@ jobs:
           app_user_id=$(gh api "/users/${APP_SLUG}[bot]" --jq .id)
           git config user.name "${APP_SLUG}[bot]"
           git config user.email "${app_user_id}+${APP_SLUG}[bot]@users.noreply.github.com"
-          git commit -m "chore: prepare $VERSION"
+          git commit -m "release $VERSION"
           git tag "$VERSION"
           gh auth setup-git --hostname github.com --force
           git push --atomic origin HEAD:main "refs/tags/$VERSION"
