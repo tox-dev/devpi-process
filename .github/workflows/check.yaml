@@ -237,8 +237,8 @@ jobs:
           if-no-files-found: error
   publisher-pilot:
     name: Validate shared publisher
-    if: github.event_name == 'pull_request'
-    uses: tox-dev/github-workflows/.github/workflows/validate-python-release.yaml@ee98371ce725a1cf3993479c047aac3fdfd3343f
+    if: github.event_name == 'pull_request' || (github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main')
+    uses: tox-dev/github-workflows/.github/workflows/validate-python-release.yaml@f239f59165d1a8df5e9c4b6e30f0ce40f1bd4cc3
     permissions:
       contents: read
       pull-requests: read
