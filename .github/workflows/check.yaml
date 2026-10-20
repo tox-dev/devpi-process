@@ -238,7 +238,7 @@ jobs:
   publisher-pilot:
     name: Validate shared publisher
     if: github.event_name == 'pull_request'
-    uses: tox-dev/github-workflows/.github/workflows/validate-python-release.yaml@846a7da83671029b1c0049b55c7f6ef75cc5e9f1
+    uses: tox-dev/github-workflows/.github/workflows/validate-python-release.yaml@6fa0cc91e0ae3b414f72764a3d8b6800a0ccf912
     permissions:
       contents: read
       pull-requests: read
