@@ -90,6 +90,9 @@ release = [
 version.source = "vcs"
 build.hooks.vcs.version-file = "src/devpi_process/_version.py"
 
+[tool.uv]
+dependency-groups.release = { requires-python = ">=3.15" }
+
 [tool.black]
 line-length = 120
 
