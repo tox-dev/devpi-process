@@ -8,12 +8,12 @@ requires = [
 
 [project]
 name = "devpi-process"
+import-names = [ "devpi_process" ]
 description = "devpi process provides a programmatic API to create and use a devpi server process"
 keywords = [
-  "environments",
-  "isolated",
+  "devpi",
+  "process",
   "testing",
-  "virtual",
 ]
 license = "MIT"
 maintainers = [
@@ -25,9 +25,7 @@ authors = [
 requires-python = ">=3.11"
 classifiers = [
   "Development Status :: 5 - Production/Stable",
-  "Framework :: tox",
   "Intended Audience :: Developers",
-  "License :: OSI Approved :: MIT License",
   "Operating System :: MacOS :: MacOS X",
   "Operating System :: Microsoft :: Windows",
   "Operating System :: POSIX",
@@ -49,6 +47,7 @@ dependencies = [
   "devpi-client>=7.3",
   "devpi-server>=6.20.3",
 ]
+urls.Changelog = "https://github.com/tox-dev/devpi-process/blob/main/CHANGELOG.md"
 urls.Homepage = "https://github.com/tox-dev/devpi-process#readme"
 urls.Source = "https://github.com/tox-dev/devpi-process"
 urls.Tracker = "https://github.com/tox-dev/devpi-process/issues"
