@@ -112,9 +112,8 @@ wheels = [
 
 [[packages]]
 name = "release-creator"
-version = "0.4.1"
-sdist = { url = "https://files.pythonhosted.org/packages/98/3e/22a3249fecc6ee0e166ef81227a4ba8cb5c83e0bddd5e57b081050ca2bcd/release_creator-0.4.1.tar.gz", upload-time = 2026-10-19T20:26:30Z, size = 63943, hashes = { sha256 = "80f064352f1c0546f12e27ef643fed35e91059b095def95cb5f5baa44357a0d2" } }
-wheels = [{ url = "https://files.pythonhosted.org/packages/7b/a2/acae8a1ef434bf427f9e0726f66ddf6ee4913704e4f31891a280a712a58d/release_creator-0.4.1-py3-none-any.whl", upload-time = 2026-10-19T20:26:29Z, size = 20115, hashes = { sha256 = "0328c9044719b5e011312628a2b2cb818288f862e6ac0933510778e412b5e569" } }]
+version = "0.4.2.dev2+g893fb23f5"
+vcs = { type = "git", url = "https://github.com/tox-dev/release-creator", requested-revision = "893fb23f53288972f0204ffa67a8cc14c0b0f865", commit-id = "893fb23f53288972f0204ffa67a8cc14c0b0f865" }
 
 [[packages]]
 name = "ruff"
