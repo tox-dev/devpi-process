@@ -11,7 +11,6 @@ jobs:
     name: Label bot PRs
     runs-on: ubuntu-26.04
     permissions:
-      contents: read
       issues: write # Apply or remove the skip news label.
       pull-requests: read
     steps:
