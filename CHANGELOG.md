@@ -93,6 +93,13 @@
 
 ## 0.3.0 (2022-12-03)
 
+<a name="release-0-3-0-added"></a>
+
+### Added
+
+- Declare Python 3.11 support ([#31](https://github.com/tox-dev/devpi-process/pull/31)) by
+  [@gaborbernat](https://github.com/gaborbernat).
+
 <a name="release-0-3-0-fixed"></a>
 
 ### Fixed

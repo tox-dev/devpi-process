@@ -27,5 +27,9 @@ the label when their pull request has no fragment.
 The release workflow credits the pull request author. If several people authored the change, add their linked GitHub
 handles in one `by` phrase in the fragment. Omit bots and reviewers.
 
-The historical changelog uses `Other changes` where the original release did not identify a user-facing category. New
-pull requests use a specific category or `skip news`.
+Pending fragments stay in `changelog.d` until a release. The prepare workflow writes the tagged entries to
+`CHANGELOG.md`; maintenance-only releases keep their version heading without a news entry. The GitHub Release uses the
+same entries with unwrapped lines and GitHub contributor metadata. The PyPI upload runs only after the notes render.
+
+`pylock.toml` records the selectable dependency groups for supported Python versions and platforms. The weekly release
+lock workflow refreshes it after a seven-day cooldown. The `release` group supplies preparation and rendering tools.
