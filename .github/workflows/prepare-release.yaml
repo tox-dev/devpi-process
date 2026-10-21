@@ -18,9 +18,11 @@ permissions:
 jobs:
   prepare:
     name: Prepare Towncrier release
-    uses: tox-dev/github-workflows/.github/workflows/prepare-towncrier-release.yaml@5e11f2254a4dcb7102747d312ad7db48a2e9b0cb
+    uses: tox-dev/github-workflows/.github/workflows/prepare-towncrier-release.yaml@e8d429040f73cd95af722543a0a09717bf3bb0aa
     with:
       bump: ${{ inputs.bump }}
       changelog: CHANGELOG.md
       fragments: changelog.d
       format: markdown
+    secrets:
+      RELEASE_APP_PRIVATE_KEY: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
