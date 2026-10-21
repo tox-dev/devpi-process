@@ -4,16 +4,20 @@
 
 <a name="release-1-3-1"></a>
 
-## 1.3.1 (2026-10-19)
-
 <a name="release-1-3-1-documentation"></a>
 
-### Documentation
+## 1.3.1 (2026-10-19)
+
+<a name="release-1-3-1-packaging"></a>
+
+### Packaging
 
 - Publish a GitHub Release with the tagged changelog after each PyPI upload
   ([#290](https://github.com/tox-dev/devpi-process/pull/290)) by [@gaborbernat](https://github.com/gaborbernat).
 
 <a name="release-1-3-0"></a>
+
+<a name="release-1-3-0-changes"></a>
 
 ## 1.3.0 (2026-10-10)
 
@@ -24,14 +28,9 @@
 - Require Python 3.11 ([#284](https://github.com/tox-dev/devpi-process/pull/284)) by
   [@gaborbernat](https://github.com/gaborbernat).
 
-<a name="release-1-3-0-changes"></a>
-
-### Changes
-
-- Use Python 3.15 by default ([#284](https://github.com/tox-dev/devpi-process/pull/284)) by
-  [@gaborbernat](https://github.com/gaborbernat).
-
 <a name="release-1-2-0"></a>
+
+<a name="release-1-2-0-other-changes"></a>
 
 ## 1.2.0 (2026-07-21)
 
@@ -39,26 +38,14 @@
 
 ### Added
 
-- Test on Python 3.15 ([#262](https://github.com/tox-dev/devpi-process/pull/262)) by
-  [@gaborbernat](https://github.com/gaborbernat).
-
-<a name="release-1-2-0-other-changes"></a>
-
-### Other changes
-
-- Tighten GitHub Actions security checks ([#232](https://github.com/tox-dev/devpi-process/pull/232)) by
+- Add Python 3.15 support ([#262](https://github.com/tox-dev/devpi-process/pull/262)) by
   [@gaborbernat](https://github.com/gaborbernat).
 
 <a name="release-1-1-1"></a>
 
-## 1.1.1 (2026-02-23)
-
 <a name="release-1-1-1-other-changes"></a>
 
-### Other changes
-
-- Move the development tooling to `tox.toml`, dependency groups, and ty by
-  [@gaborbernat](https://github.com/gaborbernat).
+## 1.1.1 (2026-02-23)
 
 <a name="release-1-1-0"></a>
 
@@ -73,14 +60,9 @@
 
 <a name="release-1-0-2"></a>
 
-## 1.0.2 (2024-09-18)
-
 <a name="release-1-0-2-other-changes"></a>
 
-### Other changes
-
-- Improve CI ([#134](https://github.com/tox-dev/devpi-process/pull/134)) by
-  [@gaborbernat](https://github.com/gaborbernat).
+## 1.0.2 (2024-09-18)
 
 <a name="release-1-0-1"></a>
 
@@ -95,36 +77,31 @@
 
 <a name="release-1-0-0"></a>
 
-## 1.0.0 (2023-08-22)
-
 <a name="release-1-0-0-other-changes"></a>
 
-### Other changes
-
-- Exclude automated dependency and hook updates from generated release notes by
-  [@gaborbernat](https://github.com/gaborbernat).
+## 1.0.0 (2023-08-22)
 
 <a name="release-0-3-1"></a>
 
-## 0.3.1 (2023-06-15)
-
 <a name="release-0-3-1-other-changes"></a>
 
-### Other changes
-
-- Update dependencies and development tooling by [@gaborbernat](https://github.com/gaborbernat).
+## 0.3.1 (2023-06-15)
 
 <a name="release-0-3-0"></a>
 
-## 0.3.0 (2022-12-03)
-
 <a name="release-0-3-0-changes"></a>
 
-### Changes
+## 0.3.0 (2022-12-03)
+
+<a name="release-0-3-0-fixed"></a>
+
+### Fixed
 
 - Show stdout/stderr details if a command fails by [@gaborbernat](https://github.com/gaborbernat).
 
 <a name="release-0-2"></a>
+
+<a name="release-0-2-other-changes"></a>
 
 ## 0.2 (2021-12-29)
 
@@ -139,12 +116,6 @@
 ### Fixed
 
 - Index URL now ends with `/` to avoid redirect when sending a GET by [@gaborbernat](https://github.com/gaborbernat).
-
-<a name="release-0-2-other-changes"></a>
-
-### Other changes
-
-- Bump linters by [@gaborbernat](https://github.com/gaborbernat).
 
 <a name="release-0-1"></a>
 
