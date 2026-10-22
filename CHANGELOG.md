@@ -4,11 +4,9 @@
 
 <a name="release-1-3-1"></a>
 
-<a name="release-1-3-1-documentation"></a>
-
 ## 1.3.1 (2026-10-19)
 
-<a name="release-1-3-1-packaging"></a>
+<a name="release-1-3-1-documentation"></a> <a name="release-1-3-1-packaging"></a>
 
 ### Packaging
 
@@ -17,11 +15,9 @@
 
 <a name="release-1-3-0"></a>
 
-<a name="release-1-3-0-changes"></a>
-
 ## 1.3.0 (2026-10-10)
 
-<a name="release-1-3-0-added"></a>
+<a name="release-1-3-0-changes"></a> <a name="release-1-3-0-added"></a>
 
 ### Added
 
@@ -30,11 +26,9 @@
 
 <a name="release-1-2-0"></a>
 
-<a name="release-1-2-0-other-changes"></a>
-
 ## 1.2.0 (2026-07-21)
 
-<a name="release-1-2-0-added"></a>
+<a name="release-1-2-0-other-changes"></a> <a name="release-1-2-0-added"></a>
 
 ### Added
 
@@ -42,8 +36,6 @@
   [@gaborbernat](https://github.com/gaborbernat).
 
 <a name="release-1-1-1"></a>
-
-<a name="release-1-1-1-other-changes"></a>
 
 ## 1.1.1 (2026-02-23)
 
@@ -60,8 +52,6 @@
 
 <a name="release-1-0-2"></a>
 
-<a name="release-1-0-2-other-changes"></a>
-
 ## 1.0.2 (2024-09-18)
 
 <a name="release-1-0-1"></a>
@@ -77,23 +67,17 @@
 
 <a name="release-1-0-0"></a>
 
-<a name="release-1-0-0-other-changes"></a>
-
 ## 1.0.0 (2023-08-22)
 
 <a name="release-0-3-1"></a>
-
-<a name="release-0-3-1-other-changes"></a>
 
 ## 0.3.1 (2023-06-15)
 
 <a name="release-0-3-0"></a>
 
-<a name="release-0-3-0-changes"></a>
-
 ## 0.3.0 (2022-12-03)
 
-<a name="release-0-3-0-added"></a>
+<a name="release-0-3-0-changes"></a> <a name="release-0-3-0-added"></a>
 
 ### Added
 
@@ -108,11 +92,9 @@
 
 <a name="release-0-2"></a>
 
-<a name="release-0-2-other-changes"></a>
-
 ## 0.2 (2021-12-29)
 
-<a name="release-0-2-added"></a>
+<a name="release-0-2-other-changes"></a> <a name="release-0-2-added"></a>
 
 ### Added
 
