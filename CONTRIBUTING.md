@@ -32,4 +32,5 @@ Pending fragments stay in `changelog.d` until a release. The prepare workflow wr
 same entries with unwrapped lines and GitHub contributor metadata. The PyPI upload runs only after the notes render.
 
 `pylock.toml` records the selectable dependency groups for supported Python versions and platforms. The weekly release
-lock workflow refreshes it after a seven-day cooldown. The `release` group supplies preparation and rendering tools.
+lock workflow refreshes it after a seven-day cooldown. Release jobs install the specific tool groups they need from this
+lock.
