@@ -1972,28 +1972,28 @@ sha256 = "a00ce642f577bf7f473932318056212bc4f8bfdf53128c78bbd5af0b9b20b189"
 
 [[packages]]
 name = "pkginfo"
-version = "1.13"
+version = "1.13.1"
 marker = "\"project-runtime\" in dependency_groups"
 requires-python = ">=3.9"
 index = "https://pypi.org/simple/"
 
 [packages.sdist]
-name = "pkginfo-1.13.tar.gz"
-upload-time = 2026-08-30 02:45:07.804150+00:00
-url = "https://files.pythonhosted.org/packages/3e/ad/97538d5a1041d8d3ba155075b0b35248cf8538e1f1ec764f1d117962b01d/pkginfo-1.13.tar.gz"
-size = 453525
+name = "pkginfo-1.13.1.tar.gz"
+upload-time = 2026-10-16 13:42:15.317706+00:00
+url = "https://files.pythonhosted.org/packages/36/eb/c6f27782b275ecced71bac19afc4affa809371e0f5084aa7ae32953ea06c/pkginfo-1.13.1.tar.gz"
+size = 453268
 
 [packages.sdist.hashes]
-sha256 = "4f70471c643f71fe84a06230c0e33c5c5b12a33b2fd21bff14ddaef5a974adb1"
+sha256 = "679f51a29a8550e9eecdfab3ec1619d42e2e75c20a2a200289963ac428667657"
 
 [[packages.wheels]]
-name = "pkginfo-1.13-py3-none-any.whl"
-upload-time = 2026-08-30 02:45:06.550594+00:00
-url = "https://files.pythonhosted.org/packages/ed/ad/2e9e8a7bb014758af9453b3d818848d50852592296aceb8817f2a937fa71/pkginfo-1.13-py3-none-any.whl"
-size = 32769
+name = "pkginfo-1.13.1-py3-none-any.whl"
+upload-time = 2026-10-16 13:42:13.823202+00:00
+url = "https://files.pythonhosted.org/packages/8e/7f/7f20f10ec37a4dce32313bb21c55548e211391876c11af6c674f26fb015c/pkginfo-1.13.1-py3-none-any.whl"
+size = 33308
 
 [packages.wheels.hashes]
-sha256 = "37e1bfb7b5b149829e6f140a225b517c4c8808d8d164f68137b9492023874061"
+sha256 = "2184184d5147601c4ef91d2dd544b2529402d4ea4138279da1e10a849f15597d"
 
 [[packages]]
 name = "plaster"
@@ -2483,7 +2483,7 @@ sha256 = "d0dae1f74bb273b534770cb4cccb6bb78735540afdb03c2146f4e19dcd412560"
 
 [[packages]]
 name = "release-creator"
-version = "0.6.0"
+version = "0.6.5"
 marker = "\"release-news\" in dependency_groups or \"release-notes\" in dependency_groups or \"release-prepare\" in dependency_groups or \"release-validate\" in dependency_groups"
 requires-python = ">=3.15"
 dependencies = [
@@ -2497,22 +2497,22 @@ dependencies = [
 index = "https://pypi.org/simple/"
 
 [packages.sdist]
-name = "release_creator-0.6.0.tar.gz"
-upload-time = 2026-10-23 02:44:39.588714+00:00
-url = "https://files.pythonhosted.org/packages/17/11/c0126b406a17370db72d8a08afa1a5823204e69c44938de796cc98df0d02/release_creator-0.6.0.tar.gz"
-size = 135957
+name = "release_creator-0.6.5.tar.gz"
+upload-time = 2026-10-23 19:54:49.281646+00:00
+url = "https://files.pythonhosted.org/packages/a0/da/7195823b3d0ab066f518d8bd987f88a39e0e39da33f629e021346209a7cb/release_creator-0.6.5.tar.gz"
+size = 135158
 
 [packages.sdist.hashes]
-sha256 = "58afd3cd0fc0b0e47ded23a735a1ba9189a7b0adad410628c90c96cf74457ed6"
+sha256 = "954247b06b7b9a8c196a782252e3d980d33a9e9b7f9e5aea7647ef6c758d4275"
 
 [[packages.wheels]]
-name = "release_creator-0.6.0-py3-none-any.whl"
-upload-time = 2026-10-23 02:44:37.874747+00:00
-url = "https://files.pythonhosted.org/packages/ef/91/ad1ce7d5c65892866893879fb0f407898f2d5c808bbd266ca0a82513a205/release_creator-0.6.0-py3-none-any.whl"
-size = 49478
+name = "release_creator-0.6.5-py3-none-any.whl"
+upload-time = 2026-10-23 19:54:47.716775+00:00
+url = "https://files.pythonhosted.org/packages/f1/4c/6215690fc2b48f3d927699bb16f5c8bcf26b8862e378df33a2581a45215b/release_creator-0.6.5-py3-none-any.whl"
+size = 46723
 
 [packages.wheels.hashes]
-sha256 = "4b9cd6187c87fcb7bf3aca5f58c67c90703e58875643af633661a0448756d45f"
+sha256 = "dd109f7fb64808a83833c332b8563c56bd943c4a8de79b440eab475b5ca9a73e"
 
 [[packages]]
 name = "repoze-lru"
@@ -2902,28 +2902,28 @@ sha256 = "188306098d013b691fcadc011abd66727d3c414c571bb01b1a174ba8c983cf90"
 
 [[packages]]
 name = "tomlkit"
-version = "0.15.1"
+version = "0.15.2"
 marker = "\"build\" in dependency_groups"
 requires-python = ">=3.9"
 index = "https://pypi.org/simple/"
 
 [packages.sdist]
-name = "tomlkit-0.15.1.tar.gz"
-upload-time = 2026-07-17 01:48:04.562015+00:00
-url = "https://files.pythonhosted.org/packages/94/96/e07752635b98536177fa1f37671c8f3cdde2e724c6bcf6034b2cfb571565/tomlkit-0.15.1.tar.gz"
-size = 180129
+name = "tomlkit-0.15.2.tar.gz"
+upload-time = 2026-10-16 04:07:08.166827+00:00
+url = "https://files.pythonhosted.org/packages/08/72/fc01563df95c189a9f65850096bdc205bc2fe37da6c740cd64afaf18d07e/tomlkit-0.15.2.tar.gz"
+size = 190522
 
 [packages.sdist.hashes]
-sha256 = "e25bbf38843005246210a12982776f27f99cb9be67160e14434d0c0d21ee1e97"
+sha256 = "83e32755ba1d20d9340bd069ee97e9f6232ba2346b63ffcba425de01f7e327a6"
 
 [[packages.wheels]]
-name = "tomlkit-0.15.1-py3-none-any.whl"
-upload-time = 2026-07-17 01:48:05.728578+00:00
-url = "https://files.pythonhosted.org/packages/13/bc/8c13eb66537dce1d2bd3a57132902f38d0e7f5bb46fa9f4daed9fe9d76ee/tomlkit-0.15.1-py3-none-any.whl"
-size = 49449
+name = "tomlkit-0.15.2-py3-none-any.whl"
+upload-time = 2026-10-16 04:07:09.216014+00:00
+url = "https://files.pythonhosted.org/packages/da/46/7d84138a60a8bd796825b2d38ebe92d0d16501ca57d501b7c5d677401bbc/tomlkit-0.15.2-py3-none-any.whl"
+size = 52225
 
 [packages.wheels.hashes]
-sha256 = "177a05aece5a8ca5266fd3c448abb47b8d352f09d477d3ca8332db4d89b24304"
+sha256 = "05562412163a3037b94497385fb7f9204c637bc605af7a48199e41cf2272f437"
 
 [[packages]]
 name = "towncrier"
@@ -3476,18 +3476,19 @@ sha256 = "10f15d6b70842405755d6ef128d731ff14f2f655bad56b7fe5d19588c24d08bc"
 
 [tool.nab]
 nab-version = "0.0.22"
-created-at = 2026-10-23 02:56:10.067209+00:00
+created-at = 2026-10-23 20:06:32.915916+00:00
 command-line = [
     "nab",
     "lock",
+    "--no-cache",
     "--groups",
-    "lock-tools",
-    "pkg-meta",
     "release-check",
     "release-news",
     "release-notes",
     "release-prepare",
     "release-validate",
+    "pkg-meta",
+    "lock-tools",
     "--output",
     "pylock.toml",
     "--upgrade",
