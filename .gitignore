@@ -5,3 +5,4 @@ coverage.xml
 __pycache__
 **.pyc
 src/devpi_process/_version.py
+/uv.lock
