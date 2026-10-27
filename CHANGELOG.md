@@ -2,6 +2,17 @@
 
 <!-- towncrier release notes start -->
 
+<a name="release-1-3-2"></a>
+
+## 1.3.2 (2026-10-27)
+
+<a name="release-1-3-2-fixed"></a>
+
+### Fixed
+
+- Fix repository links in the PyPI project description ([#292](https://github.com/tox-dev/devpi-process/pull/292)) by
+  [@gaborbernat](https://github.com/gaborbernat).
+
 <a name="release-1-3-1"></a>
 
 ## 1.3.1 (2026-10-19)
