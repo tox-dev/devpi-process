@@ -1,7 +1,7 @@
 # Security policy
 
-devpi-process is a Python library that starts a throwaway devpi server, creates users and indexes on it, and uploads
-packages, for use in tests. This policy says how to report a security problem and how we decide whether a report is one.
+devpi-process is a Python library that starts a throwaway devpi server, creates indexes on it, and uploads packages, for
+use in tests. This policy says how to report a security problem and how we decide whether a report is one.
 
 ## Reporting a vulnerability
 
@@ -35,9 +35,9 @@ advisory. Classify by who supplies the dangerous input, not by how bad the outco
 
 **In scope**
 
-- devpi-process starting the server on an interface other than localhost by default.
-- devpi-process running a program other than the `devpi-init`, `devpi-server` and `devpi` next to the interpreter, or
-  passing caller data to them as anything but separate arguments.
+- devpi-process starting the server on an interface other than localhost when the caller passes no `start_args`.
+- devpi-process running a program other than the `devpi-init`, `devpi-server` and `devpi` in the interpreter's scripts
+  directory, or passing caller data to them as anything but separate arguments.
 - Server data written outside the directory the caller passed.
 
 **Out of scope**

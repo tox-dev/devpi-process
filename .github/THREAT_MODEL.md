@@ -7,9 +7,10 @@ disagree, SECURITY.md wins and we fix this file.
 ## How devpi-process works
 
 `IndexServer(path)` runs `devpi-init` to initialize a server directory with a random root password, starts
-`devpi-server` on `localhost` and a free port, and drives the `devpi` client to log in, create users and indexes, and
-upload distributions. Every program runs with an argument list, never a shell. When the context manager exits, the
-server process stops.
+`devpi-server` on a free port at its default host, `localhost`, and drives the `devpi` client to log in as root, create
+indexes and upload distributions. The three programs come from the interpreter's scripts directory and run with argument
+lists, never a shell. Upstream PyPI is off unless `with_root_pypi` is set. When the context manager exits, the server
+process stops.
 
 ```mermaid
 flowchart LR
@@ -33,7 +34,7 @@ the attacker controls.
 
 | Project                                                                                 | Language   | Where it draws the line                                                                                                             |
 | --------------------------------------------------------------------------------------- | ---------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| [Verdaccio](https://github.com/verdaccio/verdaccio/security/policy)                     | JavaScript | A private registry often started as a throwaway test server; reports go through Snyk.                                               |
+| [Verdaccio](https://github.com/verdaccio/verdaccio/security/policy)                     | JavaScript | Private registry; reports go through Snyk.                                                                                          |
 | [distribution (registry)](https://github.com/distribution/distribution/security/policy) | Go         | The OCI registry used as a test fixture; private reports to its CNCF list.                                                          |
 | [Vitest](https://github.com/vitest-dev/vitest/security/policy)                          | JavaScript | Trusts the developer, the config file, plugins and every project file; only reports that need no trusted element compromised count. |
 
@@ -41,28 +42,28 @@ the attacker controls.
 
 An attacker who controls any of these already has what devpi-process could give them:
 
-- The test code and every path, user, index and file it passes.
-- The devpi tools installed next to the interpreter, and the packages uploaded.
+- The test code and every path, index name, argument and file it passes, `start_args` included.
+- The devpi tools in the interpreter's scripts directory, and the packages uploaded.
 
 ## Untrusted inputs
 
-| Input           | Comes from                            | What devpi-process guarantees                                                |
-| --------------- | ------------------------------------- | ---------------------------------------------------------------------------- |
-| Network clients | Anything that can connect to the port | The server listens on `localhost` only; uploads need the generated password. |
+| Input           | Comes from                            | What devpi-process guarantees                                                                         |
+| --------------- | ------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| Network clients | Anything that can connect to the port | The server listens on `localhost` unless `start_args` change it; uploads need the generated password. |
 
 ## Threats and controls
 
-| STRIDE                 | Threat                                                 | Control                                                          |
-| ---------------------- | ------------------------------------------------------ | ---------------------------------------------------------------- |
-| Spoofing               | Another process logs in as root.                       | A random root password is generated for each server.             |
-| Information disclosure | Another local user reads the root password.            | Accepted risk: it is passed to `devpi-init` on the command line. |
-| Tampering              | Caller data injects shell syntax into a devpi command. | Programs run with argument lists, never a shell.                 |
+| STRIDE                 | Threat                                                 | Control                                                                            |
+| ---------------------- | ------------------------------------------------------ | ---------------------------------------------------------------------------------- |
+| Spoofing               | Another process logs in as root.                       | A random root password is generated for each server.                               |
+| Information disclosure | Another local user reads the root password.            | Accepted risk: it is passed to `devpi-init` and `devpi login` on the command line. |
+| Tampering              | Caller data injects shell syntax into a devpi command. | Programs run with argument lists, never a shell.                                   |
 
 ## Release chain
 
 Releases run on the shared [tox-dev/github-workflows](https://github.com/tox-dev/github-workflows) pipeline. A release
-App, not a person, pushes the release commit and tag; the build installs its tools hash-checked from `pylock.toml` with
-a seven-day upload cooldown; PyPI receives the files through
+App, not a person, pushes the release commit and tag; the build installs its tools from a hash-checked `pylock.toml`
+resolved with a seven-day upload cooldown by default; PyPI receives the files through
 [trusted publishing](https://docs.pypi.org/trusted-publishers/) with attestations, and the GitHub Release is immutable.
 Every workflow pins third-party actions to a commit SHA.
 
@@ -74,10 +75,17 @@ Every workflow pins third-party actions to a commit SHA.
 | An index name with `;` runs a shell command                     | Vulnerability | Arguments must stay data.                   |
 | Another user on a shared CI host sees the root password in `ps` | Accepted risk | Documented below; use a single-user runner. |
 
+## Severity
+
+- **High:** a caller value runs as a shell command, or the server listens beyond localhost without `start_args` asking
+  for it.
+- **Medium:** server data written outside the caller's directory, or a program other than the devpi tools runs.
+- **Low:** the server fails to stop, or leaves files behind, after the context manager exits.
+
 ## Accepted risks
 
-- The root password is 8 letters from Python's `random`, and it is visible in the process list while `devpi-init` runs.
-  devpi-process is for tests on single-user machines and CI runners.
+- The root password is 8 letters from Python's `random`, and it is visible in the process list while `devpi-init` and
+  `devpi login` run. devpi-process is for tests on single-user machines and CI runners.
 
 ## Keeping this current
 
