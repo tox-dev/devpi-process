@@ -8,6 +8,8 @@ See the [changelog](CHANGELOG.md) for released changes and [contributing guide](
 [![Downloads](https://static.pepy.tech/badge/devpi-process/month)](https://pepy.tech/project/devpi-process)
 [![PyPI - License](https://img.shields.io/pypi/l/devpi-process?style=flat-square)](https://opensource.org/licenses/MIT)
 [![check](https://github.com/tox-dev/devpi-process/actions/workflows/check.yaml/badge.svg)](https://github.com/tox-dev/devpi-process/actions/workflows/check.yaml)
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/tox-dev/devpi-process/badge)](https://scorecard.dev/viewer/?uri=github.com/tox-dev/devpi-process)
+[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/16263/badge)](https://www.bestpractices.dev/projects/16263)
 
 Allows you to create [devpi](https://devpi.net/docs/devpi/devpi/stable/+d/index.html) server process with indexes, and
 upload artifacts to that programmatically.
