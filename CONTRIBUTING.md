@@ -34,3 +34,7 @@ same entries with unwrapped lines. The PyPI upload runs only after the notes ren
 `pylock.toml` records the selectable dependency groups for supported Python versions and platforms. The weekly release
 lock workflow refreshes it after a seven-day cooldown. Release jobs install the specific tool groups they need from this
 lock.
+
+## Tests
+
+Add a test for every new feature and bug fix. A change without a test needs a reason in the pull request description.
