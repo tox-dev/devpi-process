@@ -46,7 +46,10 @@ class IndexServer:
         self._with_root_pypi = with_root_pypi
         self._start_args: Sequence[str] = [] if start_args is None else start_args
 
-        self.host, self.port = "localhost", _find_free_port()
+        self.host = "localhost"
+        with closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as socket_handler:
+            socket_handler.bind(("", 0))
+            self.port = cast("int", socket_handler.getsockname()[1])
         self._passwd = "".join(random.choices(string.ascii_letters, k=8))  # ruff:ignore[suspicious-non-cryptographic-random-usage]
 
         scripts_dir = sysconfig.get_path("scripts")
@@ -165,12 +168,6 @@ class IndexServer:
         index = Index(f"{self.url}/{self.user}", name, self.user, base)
         self._indexes[name] = index
         return index
-
-
-def _find_free_port() -> int:
-    with closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as socket_handler:
-        socket_handler.bind(("", 0))
-        return cast("int", socket_handler.getsockname()[1])
 
 
 def _check_call(cmd: list[str]) -> None:
