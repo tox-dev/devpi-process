@@ -14,10 +14,10 @@ class Index:
         """
         Create index.
 
-        :param base_url: base url
+        :param base_url: server URL up to the user segment, the index URL is built from it
         :param name: name for the index server
         :param user: the username to use
-        :param client_cmd_base:
+        :param client_cmd_base: the devpi client command, with its client directory, that runs index commands
         """
         self._client_cmd_base = client_cmd_base
         self._server_url = base_url
@@ -25,7 +25,7 @@ class Index:
         self.user = user
 
     def __repr__(self) -> str:
-        """:return: repr of the index"""
+        """Return the repr of the index."""
         return f"{self.__class__.__name__}(url={self.url})"
 
     @property

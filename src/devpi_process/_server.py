@@ -23,8 +23,8 @@ class IndexServer:
     """
     A PyPI index server locally.
 
-    :ivar host:
-    :ivar port:
+    :ivar host: name the server is reached at, always localhost
+    :ivar port: free TCP port the server listens on, picked when the object is created
     """
 
     def __init__(
@@ -70,7 +70,7 @@ class IndexServer:
         self._stdout_drain: Thread | None = None
 
     def __enter__(self) -> Self:
-        """:return: start the index server"""
+        """Start the index server."""
         self._create_and_start_server()
         self._setup_client()
         return self
@@ -136,9 +136,9 @@ class IndexServer:
         """
         Stop the index server.
 
-        :param exc_type:
-        :param exc_val:
-        :param exc_tb:
+        :param exc_type: type of the exception leaving the block, or None
+        :param exc_val: the exception leaving the block, or None
+        :param exc_tb: traceback of that exception, or None
         """
         if self._process is not None:  # pragma: no cover # defend against devpi startup fail
             self._process.terminate()
@@ -146,7 +146,7 @@ class IndexServer:
             self._stdout_drain.join()
 
     def __repr__(self) -> str:
-        """:return: repr of the index server"""
+        """Return the repr of the index server."""
         return f"{self.__class__.__name__}(url={self.url}, indexes={list(self._indexes)})"
 
     def create_index(self, name: str, *args: str) -> Index:
@@ -156,7 +156,7 @@ class IndexServer:
         :param name: with name
         :param args: additional arguments
         :returns: the created index
-        :raises ValueError:
+        :raises ValueError: when an index with this name already exists
         """
         if name in self._indexes:  # pragma: no cover
             msg = f"index {name} already exists"
