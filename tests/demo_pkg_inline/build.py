@@ -5,23 +5,24 @@ import tarfile
 from io import BytesIO
 from pathlib import Path
 from textwrap import dedent
+from typing import Final
 from zipfile import ZipFile
 
 name = "demo_pkg_inline"
-pkg_name = name.replace("_", "-")
+_PKG_NAME = name.replace("_", "-")
 
-version = "1.0.0"
-dist_info = f"{name}-{version}.dist-info"
-logic = f"{name}/__init__.py"
-metadata = f"{dist_info}/METADATA"
-wheel = f"{dist_info}/WHEEL"
-record = f"{dist_info}/RECORD"
-content = {
-    logic: f"def do():\n    print('greetings from {name}')",
-    metadata: f"""
+_VERSION: Final[str] = "1.0.0"
+_DIST_INFO: Final[str] = f"{name}-{_VERSION}.dist-info"
+_LOGIC: Final[str] = f"{name}/__init__.py"
+METADATA: Final[str] = f"{_DIST_INFO}/METADATA"
+wheel: Final[str] = f"{_DIST_INFO}/WHEEL"
+RECORD: Final[str] = f"{_DIST_INFO}/RECORD"
+_CONTENT = {
+    _LOGIC: f"def do():\n    print('greetings from {name}')",
+    METADATA: f"""
         Metadata-Version: 2.1
-        Name: {pkg_name}
-        Version: {version}
+        Name: {_PKG_NAME}
+        Version: {_VERSION}
         Summary: UNKNOWN
         Home-page: UNKNOWN
         Author: UNKNOWN
@@ -33,17 +34,17 @@ content = {
        """,
     wheel: f"""
         Wheel-Version: 1.0
-        Generator: {name}-{version}
+        Generator: {name}-{_VERSION}
         Root-Is-Purelib: true
         Tag: py{sys.version_info[0]}-none-any
        """,
-    f"{dist_info}/top_level.txt": name,
-    record: f"""
+    f"{_DIST_INFO}/top_level.txt": name,
+    RECORD: f"""
         {name}/__init__.py,,
-        {dist_info}/METADATA,,
-        {dist_info}/WHEEL,,
-        {dist_info}/top_level.txt,,
-        {dist_info}/RECORD,,
+        {_DIST_INFO}/METADATA,,
+        {_DIST_INFO}/WHEEL,,
+        {_DIST_INFO}/top_level.txt,,
+        {_DIST_INFO}/RECORD,,
        """,
 }
 
@@ -53,10 +54,9 @@ def build_wheel(
     metadata_directory: str | None = None,  # ruff:ignore[unused-function-argument]
     config_settings: None = None,  # ruff:ignore[unused-function-argument]
 ) -> str:
-    base_name = f"{name}-{version}-py{sys.version_info[0]}-none-any.whl"
-    path = Path(wheel_directory) / base_name
-    with ZipFile(str(path), "w") as zip_file_handler:
-        for arc_name, data in content.items():  # pragma: no branch
+    base_name = f"{name}-{_VERSION}-py{sys.version_info[0]}-none-any.whl"
+    with ZipFile(str(Path(wheel_directory) / base_name), "w") as zip_file_handler:
+        for arc_name, data in _CONTENT.items():  # pragma: no branch
             zip_file_handler.writestr(arc_name, dedent(data).strip())
     return base_name
 
@@ -71,13 +71,13 @@ def build_sdist(
     sdist_directory: str,
     config_settings: None = None,  # ruff:ignore[unused-function-argument]
 ) -> str:
-    result = f"{name}-{version}.tar.gz"
+    result = f"{name}-{_VERSION}.tar.gz"
     with tarfile.open(str(Path(sdist_directory) / result), "w:gz") as tar:
         root = Path(__file__).parent
         tar.add(str(root / "build.py"), "build.py")
         tar.add(str(root / "pyproject.toml"), "pyproject.toml")
 
-        pkg_info = dedent(content[metadata]).strip().encode("utf-8")
+        pkg_info = dedent(_CONTENT[METADATA]).strip().encode("utf-8")
         info = tarfile.TarInfo("PKG-INFO")
         info.size = len(pkg_info)
         tar.addfile(info, BytesIO(pkg_info))

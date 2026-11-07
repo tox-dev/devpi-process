@@ -28,17 +28,14 @@ def demo_artifacts(tmp_path_factory: TempPathFactory) -> tuple[Path, Path]:
     assert loader is not None
     loader.exec_module(build)
     base = tmp_path_factory.mktemp("wheel")
-    wheel = base / build.build_wheel(str(base))
-    sdist = base / build.build_sdist(str(base))
-    return wheel, sdist
+    return (base / build.build_wheel(str(base))), (base / build.build_sdist(str(base)))
 
 
 def test_create_server(tmp_path: Path, demo_artifacts: tuple[Path, Path]) -> None:
     with IndexServer(tmp_path) as server:
         assert repr(server)
         state = get(server.url).json()["result"]["root"]
-        assert state["username"] == "root"
-        assert state["indexes"] == {}
+        assert (state["username"], state["indexes"]) == ("root", {})
 
         server.create_index("base")
 

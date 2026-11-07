@@ -21,52 +21,13 @@ if TYPE_CHECKING:
     from typing import Self
 
 
-def _check_call(cmd: list[str]) -> None:
-    run(cmd, check=True, capture_output=True)  # ruff:ignore[subprocess-without-shell-equals-true]
-
-
-class Index:
-    """Index."""
-
-    def __init__(self, base_url: str, name: str, user: str, client_cmd_base: list[str]) -> None:
-        """
-        Create index.
-
-        :param base_url: base url
-        :param name: name for the index server
-        :param user: the username to use
-        :param client_cmd_base:
-        """
-        self._client_cmd_base = client_cmd_base
-        self._server_url = base_url
-        self.name = name
-        self.user = user
-
-    @property
-    def url(self) -> str:
-        """The URL to the index server."""
-        return f"{self._server_url}/{self.name}/+simple/"
-
-    def use(self) -> None:
-        """Use this index server."""
-        _check_call([*self._client_cmd_base, "use", f"{self.user}/{self.name}"])
-
-    def upload(self, *files: Path) -> None:
-        """
-        Upload packages to the index.
-
-        :param files: the files to upload
-        """
-        cmd = self._client_cmd_base + ["upload", "--index", self.name] + [str(i) for i in files]
-        _check_call(cmd)
-
-    def __repr__(self) -> str:
-        """:return: repr of the index"""
-        return f"{self.__class__.__name__}(url={self.url})"
-
-
 class IndexServer:
-    """A PyPI index server locally."""
+    """
+    A PyPI index server locally.
+
+    :ivar host:
+    :ivar port:
+    """
 
     def __init__(
         self,
@@ -106,11 +67,6 @@ class IndexServer:
         self._process: Popen[str] | None = None
         self._has_use = False
         self._stdout_drain: Thread | None = None
-
-    @property
-    def user(self) -> str:
-        """Username of the index server."""
-        return "root"
 
     def __enter__(self) -> Self:
         """:return: start the index server"""
@@ -154,28 +110,21 @@ class IndexServer:
             yield stdout.readline()
 
     def _setup_client(self) -> None:
-        """Create a user on the server and authenticate it."""
+        # Create a user on the server and authenticate it.
         self._client_dir.mkdir(exist_ok=True)
         base = ["--clientdir", str(self._client_dir)]
         _check_call([self._client, "use", *base, self.url])
         _check_call([self._client, "login", *base, self.user, "--password", self._passwd])
 
-    def create_index(self, name: str, *args: str) -> Index:
-        """
-        Create an index on the server.
+    @property
+    def url(self) -> str:
+        """URL to the index server."""
+        return f"http://{self.host}:{self.port}"
 
-        :param name: with name
-        :param args: additional arguments
-        :return: the created index
-        """
-        if name in self._indexes:  # pragma: no cover
-            msg = f"index {name} already exists"
-            raise ValueError(msg)
-        base = [self._client, "--clientdir", str(self._client_dir)]
-        _check_call([*base, "index", "-c", name, *args])
-        index = Index(f"{self.url}/{self.user}", name, self.user, base)
-        self._indexes[name] = index
-        return index
+    @property
+    def user(self) -> str:
+        """Username of the index server."""
+        return "root"
 
     def __exit__(
         self,
@@ -195,20 +144,76 @@ class IndexServer:
         if self._stdout_drain is not None and self._stdout_drain.is_alive():  # pragma: no cover # devpi startup fail
             self._stdout_drain.join()
 
-    @property
-    def url(self) -> str:
-        """URL to the index server."""
-        return f"http://{self.host}:{self.port}"
-
     def __repr__(self) -> str:
         """:return: repr of the index server"""
         return f"{self.__class__.__name__}(url={self.url}, indexes={list(self._indexes)})"
+
+    def create_index(self, name: str, *args: str) -> Index:
+        """
+        Create an index on the server.
+
+        :param name: with name
+        :param args: additional arguments
+        :returns: the created index
+        :raises ValueError:
+        """
+        if name in self._indexes:  # pragma: no cover
+            msg = f"index {name} already exists"
+            raise ValueError(msg)
+        base = [self._client, "--clientdir", str(self._client_dir)]
+        _check_call([*base, "index", "-c", name, *args])
+        index = Index(f"{self.url}/{self.user}", name, self.user, base)
+        self._indexes[name] = index
+        return index
 
 
 def _find_free_port() -> int:
     with closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as socket_handler:
         socket_handler.bind(("", 0))
         return cast("int", socket_handler.getsockname()[1])
+
+
+def _check_call(cmd: list[str]) -> None:
+    run(cmd, check=True, capture_output=True)  # ruff:ignore[subprocess-without-shell-equals-true]
+
+
+class Index:
+    """Index."""
+
+    def __init__(self, base_url: str, name: str, user: str, client_cmd_base: list[str]) -> None:
+        """
+        Create index.
+
+        :param base_url: base url
+        :param name: name for the index server
+        :param user: the username to use
+        :param client_cmd_base:
+        """
+        self._client_cmd_base = client_cmd_base
+        self._server_url = base_url
+        self.name = name
+        self.user = user
+
+    def __repr__(self) -> str:
+        """:return: repr of the index"""
+        return f"{self.__class__.__name__}(url={self.url})"
+
+    @property
+    def url(self) -> str:
+        """The URL to the index server."""
+        return f"{self._server_url}/{self.name}/+simple/"
+
+    def use(self) -> None:
+        """Use this index server."""
+        _check_call([*self._client_cmd_base, "use", f"{self.user}/{self.name}"])
+
+    def upload(self, *files: Path) -> None:
+        """
+        Upload packages to the index.
+
+        :param files: the files to upload
+        """
+        _check_call(self._client_cmd_base + ["upload", "--index", self.name] + [str(i) for i in files])
 
 
 __all__ = [
