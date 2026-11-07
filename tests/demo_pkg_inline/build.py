@@ -8,18 +8,18 @@ from textwrap import dedent
 from typing import Final
 from zipfile import ZipFile
 
-name = "demo_pkg_inline"
-_PKG_NAME = name.replace("_", "-")
+_NAME: Final[str] = "demo_pkg_inline"
+_PKG_NAME: Final[str] = _NAME.replace("_", "-")
 
 _VERSION: Final[str] = "1.0.0"
-_DIST_INFO: Final[str] = f"{name}-{_VERSION}.dist-info"
-_LOGIC: Final[str] = f"{name}/__init__.py"
-METADATA: Final[str] = f"{_DIST_INFO}/METADATA"
-wheel: Final[str] = f"{_DIST_INFO}/WHEEL"
-RECORD: Final[str] = f"{_DIST_INFO}/RECORD"
-_CONTENT = {
-    _LOGIC: f"def do():\n    print('greetings from {name}')",
-    METADATA: f"""
+_DIST_INFO: Final[str] = f"{_NAME}-{_VERSION}.dist-info"
+_LOGIC: Final[str] = f"{_NAME}/__init__.py"
+_METADATA: Final[str] = f"{_DIST_INFO}/METADATA"
+_WHEEL: Final[str] = f"{_DIST_INFO}/WHEEL"
+_RECORD: Final[str] = f"{_DIST_INFO}/RECORD"
+_CONTENT: Final[dict[str, str]] = {
+    _LOGIC: f"def do():\n    print('greetings from {_NAME}')",
+    _METADATA: f"""
         Metadata-Version: 2.1
         Name: {_PKG_NAME}
         Version: {_VERSION}
@@ -32,15 +32,15 @@ _CONTENT = {
 
         UNKNOWN
        """,
-    wheel: f"""
+    _WHEEL: f"""
         Wheel-Version: 1.0
-        Generator: {name}-{_VERSION}
+        Generator: {_NAME}-{_VERSION}
         Root-Is-Purelib: true
         Tag: py{sys.version_info[0]}-none-any
        """,
-    f"{_DIST_INFO}/top_level.txt": name,
-    RECORD: f"""
-        {name}/__init__.py,,
+    f"{_DIST_INFO}/top_level.txt": _NAME,
+    _RECORD: f"""
+        {_NAME}/__init__.py,,
         {_DIST_INFO}/METADATA,,
         {_DIST_INFO}/WHEEL,,
         {_DIST_INFO}/top_level.txt,,
@@ -54,7 +54,7 @@ def build_wheel(
     metadata_directory: str | None = None,  # ruff:ignore[unused-function-argument]  # PEP 517 hook signature, the backend must accept the argument
     config_settings: None = None,  # ruff:ignore[unused-function-argument]  # PEP 517 hook signature, the backend must accept the argument
 ) -> str:
-    base_name = f"{name}-{_VERSION}-py{sys.version_info[0]}-none-any.whl"
+    base_name = f"{_NAME}-{_VERSION}-py{sys.version_info[0]}-none-any.whl"
     with ZipFile(str(Path(wheel_directory) / base_name), "w") as zip_file_handler:
         for arc_name, data in _CONTENT.items():  # pragma: no branch  # the content table always has entries
             zip_file_handler.writestr(arc_name, dedent(data).strip())
@@ -71,13 +71,13 @@ def build_sdist(
     sdist_directory: str,
     config_settings: None = None,  # ruff:ignore[unused-function-argument]  # PEP 517 hook signature, the backend must accept the argument
 ) -> str:
-    result = f"{name}-{_VERSION}.tar.gz"
+    result = f"{_NAME}-{_VERSION}.tar.gz"
     with tarfile.open(str(Path(sdist_directory) / result), "w:gz") as tar:
         root = Path(__file__).parent
         tar.add(str(root / "build.py"), "build.py")
         tar.add(str(root / "pyproject.toml"), "pyproject.toml")
 
-        pkg_info = dedent(_CONTENT[METADATA]).strip().encode("utf-8")
+        pkg_info = dedent(_CONTENT[_METADATA]).strip().encode("utf-8")
         info = tarfile.TarInfo("PKG-INFO")
         info.size = len(pkg_info)
         tar.addfile(info, BytesIO(pkg_info))
