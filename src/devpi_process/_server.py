@@ -111,7 +111,6 @@ class IndexServer:
             yield stdout.readline()
 
     def _setup_client(self) -> None:
-        # Create a user on the server and authenticate it.
         self._client_dir.mkdir(exist_ok=True)
         base = ["--clientdir", str(self._client_dir)]
         _check_call([self._client, "use", *base, self.url])

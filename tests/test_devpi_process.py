@@ -28,7 +28,7 @@ def demo_artifacts(tmp_path_factory: TempPathFactory) -> tuple[Path, Path]:
     assert loader is not None
     loader.exec_module(build)
     base = tmp_path_factory.mktemp("wheel")
-    return (base / build.build_wheel(str(base))), (base / build.build_sdist(str(base)))
+    return base / build.build_wheel(str(base)), base / build.build_sdist(str(base))
 
 
 def test_create_server(tmp_path: Path, demo_artifacts: tuple[Path, Path]) -> None:
