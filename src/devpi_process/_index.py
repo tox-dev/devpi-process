@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from subprocess import run  # ruff:ignore[suspicious-subprocess-import]
+from subprocess import run  # ruff:ignore[suspicious-subprocess-import]  # no shell, argument lists only
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -47,7 +47,7 @@ class Index:
 
 
 def _check_call(cmd: list[str]) -> None:
-    run(cmd, check=True, capture_output=True)  # ruff:ignore[subprocess-without-shell-equals-true]
+    run(cmd, check=True, capture_output=True)  # ruff:ignore[subprocess-without-shell-equals-true]  # no shell, argument list only
 
 
 __all__ = [

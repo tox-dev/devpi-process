@@ -7,7 +7,7 @@ import sys
 import sysconfig
 from contextlib import closing
 from pathlib import Path
-from subprocess import PIPE, Popen  # ruff:ignore[suspicious-subprocess-import]
+from subprocess import PIPE, Popen  # ruff:ignore[suspicious-subprocess-import]  # no shell, argument lists only
 from threading import Thread
 from typing import IO, TYPE_CHECKING, cast
 
@@ -30,7 +30,7 @@ class IndexServer:
     def __init__(
         self,
         path: Path,
-        with_root_pypi: bool = False,  # ruff:ignore[boolean-type-hint-positional-argument, boolean-default-value-positional-argument]
+        with_root_pypi: bool = False,  # ruff:ignore[boolean-type-hint-positional-argument, boolean-default-value-positional-argument]  # public parameter, changing it breaks callers
         start_args: Sequence[str] | None = None,
     ) -> None:
         """
@@ -48,12 +48,12 @@ class IndexServer:
         with closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as socket_handler:
             socket_handler.bind(("", 0))
             self.port = cast("int", socket_handler.getsockname()[1])
-        self._passwd = "".join(random.choices(string.ascii_letters, k=8))  # ruff:ignore[suspicious-non-cryptographic-random-usage]
+        self._passwd = "".join(random.choices(string.ascii_letters, k=8))  # ruff:ignore[suspicious-non-cryptographic-random-usage]  # throwaway password of a test server
 
         scripts_dir = sysconfig.get_path("scripts")
         if scripts_dir is None:
-            msg = "could not get scripts folder of host interpreter"  # pragma: no cover
-            raise RuntimeError(msg)  # pragma: no cover
+            msg = "could not get scripts folder of host interpreter"  # pragma: no cover  # typing guard
+            raise RuntimeError(msg)  # pragma: no cover  # typing guard
 
         def _exe(name: str) -> str:
             return str(Path(scripts_dir) / f"{name}{'.exe' if sys.platform == 'win32' else ''}")
@@ -87,7 +87,7 @@ class IndexServer:
         # 2. start the server
         cmd = [self._server, "--serverdir", server_at, "--port", str(self.port)]
         cmd.extend(self._start_args)
-        self._process = Popen(cmd, stdout=PIPE, universal_newlines=True)  # ruff:ignore[subprocess-without-shell-equals-true]
+        self._process = Popen(cmd, stdout=PIPE, universal_newlines=True)  # ruff:ignore[subprocess-without-shell-equals-true]  # no shell, argument list only
         stdout = self._drain_stdout()
         for line in stdout:  # pragma: no branch # will always loop at least once
             if "serving at url" in line:
@@ -105,8 +105,8 @@ class IndexServer:
         process = cast("Popen[str]", self._process)
         stdout = cast("IO[str]", process.stdout)
         while True:
-            if process.poll() is not None:  # pragma: no cover
-                print(f"devpi server with pid {process.pid} at {self._server_dir} died")  # ruff:ignore[print]
+            if process.poll() is not None:  # pragma: no cover  # a dead server is a failure path the tests do not drive
+                print(f"devpi server with pid {process.pid} at {self._server_dir} died")  # ruff:ignore[print]  # reports the dead server in the test output
                 break
             yield stdout.readline()
 
@@ -158,7 +158,7 @@ class IndexServer:
         :returns: the created index
         :raises ValueError: when an index with this name already exists
         """
-        if name in self._indexes:  # pragma: no cover
+        if name in self._indexes:  # pragma: no cover  # a duplicate name is a caller error the tests do not drive
             msg = f"index {name} already exists"
             raise ValueError(msg)
         base = [self._client, "--clientdir", str(self._client_dir)]
