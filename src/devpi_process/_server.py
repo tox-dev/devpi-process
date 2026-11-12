@@ -1,17 +1,19 @@
 from __future__ import annotations
 
-import random
+import secrets
 import socket
 import string
 import sys
 import sysconfig
 from contextlib import closing
+from logging import getLogger
 from pathlib import Path
 from subprocess import PIPE, Popen  # ruff:ignore[suspicious-subprocess-import]  # no shell, argument lists only
 from threading import Thread
 from typing import IO, TYPE_CHECKING, cast
 
-from ._index import Index, _check_call
+from ._command import check_call
+from ._index import Index
 
 if TYPE_CHECKING:
     from collections.abc import Iterator, Sequence
@@ -30,7 +32,8 @@ class IndexServer:
     def __init__(
         self,
         path: Path,
-        with_root_pypi: bool = False,  # ruff:ignore[boolean-type-hint-positional-argument, boolean-default-value-positional-argument]  # public parameter, changing it breaks callers
+        # Preserve the public positional argument.
+        with_root_pypi: bool = False,  # ruff:ignore[boolean-type-hint-positional-argument, boolean-default-value-positional-argument]
         start_args: Sequence[str] | None = None,
     ) -> None:
         """
@@ -46,14 +49,14 @@ class IndexServer:
 
         self.host = "localhost"
         with closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as socket_handler:
-            socket_handler.bind(("", 0))
+            socket_handler.bind(("", 0))  # devpi can bind to any IPv4 interface via start_args
             self.port = cast("int", socket_handler.getsockname()[1])
-        self._passwd = "".join(random.choices(string.ascii_letters, k=8))  # ruff:ignore[suspicious-non-cryptographic-random-usage]  # throwaway password of a test server
+        self._passwd = "".join(secrets.choice(string.ascii_letters) for _ in range(8))
 
         scripts_dir = sysconfig.get_path("scripts")
         if scripts_dir is None:
-            msg = "could not get scripts folder of host interpreter"  # pragma: no cover  # typing guard
-            raise RuntimeError(msg)  # pragma: no cover  # typing guard
+            msg = "could not get scripts folder of host interpreter"
+            raise RuntimeError(msg)
 
         def _exe(name: str) -> str:
             return str(Path(scripts_dir) / f"{name}{'.exe' if sys.platform == 'win32' else ''}")
@@ -71,8 +74,12 @@ class IndexServer:
 
     def __enter__(self) -> Self:
         """Start the index server."""
-        self._create_and_start_server()
-        self._setup_client()
+        try:
+            self._create_and_start_server()
+            self._setup_client()
+        except BaseException:
+            self.__exit__(None, None, None)
+            raise
         return self
 
     def _create_and_start_server(self) -> None:
@@ -83,13 +90,13 @@ class IndexServer:
         cmd.extend(("--role", "standalone", "--root-passwd", self._passwd))
         if self._with_root_pypi is False:
             cmd.append("--no-root-pypi")
-        _check_call(cmd)
+        check_call(cmd)
         # 2. start the server
         cmd = [self._server, "--serverdir", server_at, "--port", str(self.port)]
         cmd.extend(self._start_args)
         self._process = Popen(cmd, stdout=PIPE, universal_newlines=True)  # ruff:ignore[subprocess-without-shell-equals-true]  # no shell, argument list only
         stdout = self._drain_stdout()
-        for line in stdout:  # pragma: no branch # will always loop at least once
+        for line in stdout:
             if "serving at url" in line:
 
                 def _keep_draining() -> None:
@@ -100,21 +107,24 @@ class IndexServer:
                 self._stdout_drain = Thread(target=_keep_draining, name="tox-test-stdout-drain")
                 self._stdout_drain.start()
                 break
+        else:
+            msg = f"devpi server at {self._server_dir} exited before it was ready"
+            raise RuntimeError(msg)
 
     def _drain_stdout(self) -> Iterator[str]:
         process = cast("Popen[str]", self._process)
         stdout = cast("IO[str]", process.stdout)
         while True:
-            if process.poll() is not None:  # pragma: no cover  # a dead server is a failure path the tests do not drive
-                print(f"devpi server with pid {process.pid} at {self._server_dir} died")  # ruff:ignore[print]  # reports the dead server in the test output
+            if process.poll() is not None:
+                getLogger(__name__).error("devpi server with pid %s at %s died", process.pid, self._server_dir)
                 break
             yield stdout.readline()
 
     def _setup_client(self) -> None:
         self._client_dir.mkdir(exist_ok=True)
         base = ["--clientdir", str(self._client_dir)]
-        _check_call([self._client, "use", *base, self.url])
-        _check_call([self._client, "login", *base, self.user, "--password", self._passwd])
+        check_call([self._client, "use", *base, self.url])
+        check_call([self._client, "login", *base, self.user, "--password", self._passwd])
 
     @property
     def url(self) -> str:
@@ -139,9 +149,9 @@ class IndexServer:
         :param exc_val: the exception leaving the block, or None
         :param exc_tb: traceback of that exception, or None
         """
-        if self._process is not None:  # pragma: no cover # defend against devpi startup fail
+        if self._process is not None:
             self._process.terminate()
-        if self._stdout_drain is not None and self._stdout_drain.is_alive():  # pragma: no cover # devpi startup fail
+        if self._stdout_drain is not None and self._stdout_drain.is_alive():
             self._stdout_drain.join()
 
     def __repr__(self) -> str:
@@ -157,11 +167,11 @@ class IndexServer:
         :returns: the created index
         :raises ValueError: when an index with this name already exists
         """
-        if name in self._indexes:  # pragma: no cover  # a duplicate name is a caller error the tests do not drive
+        if name in self._indexes:
             msg = f"index {name} already exists"
             raise ValueError(msg)
         base = [self._client, "--clientdir", str(self._client_dir)]
-        _check_call([*base, "index", "-c", name, *args])
+        check_call([*base, "index", "-c", name, *args])
         index = Index(f"{self.url}/{self.user}", name, self.user, base)
         self._indexes[name] = index
         return index
