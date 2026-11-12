@@ -1,10 +1,8 @@
 from __future__ import annotations
 
-from subprocess import run  # ruff:ignore[suspicious-subprocess-import]  # no shell, argument lists only
-from typing import TYPE_CHECKING
+from pathlib import Path  # ruff:ignore[typing-only-standard-library-import] public annotation supports get_type_hints
 
-if TYPE_CHECKING:
-    from pathlib import Path
+from ._command import check_call
 
 
 class Index:
@@ -35,7 +33,7 @@ class Index:
 
     def use(self) -> None:
         """Use this index server."""
-        _check_call([*self._client_cmd_base, "use", f"{self.user}/{self.name}"])
+        check_call([*self._client_cmd_base, "use", f"{self.user}/{self.name}"])
 
     def upload(self, *files: Path) -> None:
         """
@@ -43,11 +41,7 @@ class Index:
 
         :param files: the files to upload
         """
-        _check_call(self._client_cmd_base + ["upload", "--index", self.name] + [str(i) for i in files])
-
-
-def _check_call(cmd: list[str]) -> None:
-    run(cmd, check=True, capture_output=True)  # ruff:ignore[subprocess-without-shell-equals-true]  # no shell, argument list only
+        check_call(self._client_cmd_base + ["upload", "--index", self.name] + [str(i) for i in files])
 
 
 __all__ = [

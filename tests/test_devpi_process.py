@@ -1,34 +1,50 @@
 from __future__ import annotations
 
+import socket
+import sysconfig
+from contextlib import ExitStack
+from http import HTTPStatus
 from importlib.util import module_from_spec, spec_from_file_location
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, get_type_hints
 
 import pytest
 from httpx import get
 
-from devpi_process import IndexServer
+from devpi_process import Index, IndexServer, __version__
 
 if TYPE_CHECKING:
-    from _pytest.tmpdir import TempPathFactory
+    from types import ModuleType
 
 
 def test_version() -> None:
-    import devpi_process  # ruff:ignore[import-outside-top-level]  # the test checks the package import itself
+    assert __version__ is not None
 
-    assert devpi_process.__version__ is not None
+
+def test_index_upload_type_hints() -> None:
+    assert get_type_hints(Index.upload)["files"] is Path
 
 
 @pytest.fixture(scope="session")
-def demo_artifacts(tmp_path_factory: TempPathFactory) -> tuple[Path, Path]:
+def demo_backend() -> ModuleType:
     spec = spec_from_file_location("demo_pkg_inline.build", str(Path(__file__).parent / "demo_pkg_inline" / "build.py"))
     assert spec is not None
     build = module_from_spec(spec)
     loader = spec.loader
     assert loader is not None
     loader.exec_module(build)
+    return build
+
+
+@pytest.fixture(scope="session")
+def demo_artifacts(tmp_path_factory: pytest.TempPathFactory, demo_backend: ModuleType) -> tuple[Path, Path]:
     base = tmp_path_factory.mktemp("wheel")
-    return base / build.build_wheel(str(base)), base / build.build_sdist(str(base))
+    return base / demo_backend.build_wheel(str(base)), base / demo_backend.build_sdist(str(base))
+
+
+def test_demo_backend_requires_no_extra_build_dependencies(demo_backend: ModuleType) -> None:
+    assert demo_backend.get_requires_for_build_wheel() == []
+    assert demo_backend.get_requires_for_build_sdist() == []
 
 
 def test_create_server(tmp_path: Path, demo_artifacts: tuple[Path, Path]) -> None:
@@ -65,8 +81,48 @@ def test_create_server_with_pypi(tmp_path: Path) -> None:
 
 
 def test_create_server_start_args(tmp_path: Path) -> None:
-    with IndexServer(tmp_path, start_args=["--offline-mode"]) as server:
-        assert server._process is not None  # ruff:ignore[private-member-access]  # the test inspects the spawned command
-        args = server._process.args  # ruff:ignore[private-member-access]  # the test inspects the spawned command
-        assert isinstance(args, list)
-        assert args[-1] == "--offline-mode"
+    with IndexServer(tmp_path, start_args=["--host", "127.0.0.1"]) as server:
+        response = get(f"{server.url}/+status", headers={"Accept": "application/json"})
+        assert response.status_code == HTTPStatus.OK
+        assert response.json()["result"]["host"] == "127.0.0.1"
+
+
+def test_server_probes_all_ipv4_interfaces(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    bound_addresses: list[socket._Address] = []
+
+    class ProbeSocket(socket.socket):
+        def bind(self, address: socket._Address) -> None:
+            bound_addresses.append(address)
+            super().bind(address)
+
+    monkeypatch.setattr(socket, "socket", ProbeSocket)
+
+    IndexServer(tmp_path)
+
+    assert bound_addresses == [("", 0)]
+
+
+def test_create_server_rejects_duplicate_index(tmp_path: Path) -> None:
+    with IndexServer(tmp_path) as server:
+        server.create_index("base")
+        with pytest.raises(ValueError, match="index base already exists"):
+            server.create_index("base")
+
+
+def test_create_server_rejects_missing_scripts(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(sysconfig, "get_path", lambda _name: None)
+
+    with pytest.raises(RuntimeError, match="could not get scripts folder of host interpreter"):
+        IndexServer(tmp_path)
+
+
+def test_create_server_reports_missing_executable(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(sysconfig, "get_path", lambda _name: str(tmp_path / "missing"))
+
+    with ExitStack() as stack, pytest.raises(FileNotFoundError, match="devpi-init"):
+        stack.enter_context(IndexServer(tmp_path))
+
+
+def test_create_server_reports_startup_failure(tmp_path: Path) -> None:
+    with ExitStack() as stack, pytest.raises(RuntimeError, match="exited before it was ready"):
+        stack.enter_context(IndexServer(tmp_path, start_args=["--definitely-invalid"]))

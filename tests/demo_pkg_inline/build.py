@@ -51,25 +51,24 @@ _CONTENT: Final[dict[str, str]] = {
 
 def build_wheel(
     wheel_directory: str,
-    metadata_directory: str | None = None,  # ruff:ignore[unused-function-argument]  # PEP 517 hook signature, the backend must accept the argument
-    config_settings: None = None,  # ruff:ignore[unused-function-argument]  # PEP 517 hook signature, the backend must accept the argument
+    metadata_directory: str | None = None,  # ruff:ignore[unused-function-argument]  # PEP 517 signature
+    config_settings: None = None,  # ruff:ignore[unused-function-argument]  # PEP 517 signature
 ) -> str:
     base_name = f"{_NAME}-{_VERSION}-py{sys.version_info[0]}-none-any.whl"
     with ZipFile(str(Path(wheel_directory) / base_name), "w") as zip_file_handler:
-        for arc_name, data in _CONTENT.items():  # pragma: no branch  # the content table always has entries
+        for arc_name, data in _CONTENT.items():  # pragma: no branch  # _CONTENT is nonempty
             zip_file_handler.writestr(arc_name, dedent(data).strip())
     return base_name
 
 
-def get_requires_for_build_wheel(
-    config_settings: None = None,  # ruff:ignore[unused-function-argument]  # PEP 517 hook signature, the backend must accept the argument
-) -> list[str]:
-    return []  # pragma: no cover # only executed in non-host pythons
+# PEP 517 requires the unused argument.
+def get_requires_for_build_wheel(config_settings: None = None) -> list[str]:  # ruff:ignore[unused-function-argument]
+    return []
 
 
 def build_sdist(
     sdist_directory: str,
-    config_settings: None = None,  # ruff:ignore[unused-function-argument]  # PEP 517 hook signature, the backend must accept the argument
+    config_settings: None = None,  # ruff:ignore[unused-function-argument]  # PEP 517 signature
 ) -> str:
     result = f"{_NAME}-{_VERSION}.tar.gz"
     with tarfile.open(str(Path(sdist_directory) / result), "w:gz") as tar:
@@ -85,7 +84,6 @@ def build_sdist(
     return result
 
 
-def get_requires_for_build_sdist(
-    config_settings: None = None,  # ruff:ignore[unused-function-argument]  # PEP 517 hook signature, the backend must accept the argument
-) -> list[str]:
-    return []  # pragma: no cover # only executed in non-host pythons
+# PEP 517 requires the unused argument.
+def get_requires_for_build_sdist(config_settings: None = None) -> list[str]:  # ruff:ignore[unused-function-argument]
+    return []
