@@ -101,19 +101,12 @@ class IndexServer:  # ruff:ignore[non-empty-init-module]  # Preserve the origina
         if scripts_dir is None:
             msg = "could not get scripts folder of host interpreter"
             raise RuntimeError(msg)
-
-        def _exe(name: str) -> str:
-            return str(Path(scripts_dir) / f"{name}{'.exe' if sys.platform == 'win32' else ''}")
-
-        self._init: str = _exe("devpi-init")
-        self._server: str = _exe("devpi-server")
-        self._client: str = _exe("devpi")
+        self._scripts = Path(scripts_dir)
 
         self._server_dir = self.path / "server"
         self._client_dir = self.path / "client"
         self._indexes: dict[str, Index] = {}
         self._process: Popen[str] | None = None
-        self._has_use = False
         self._stdout_drain: Thread | None = None
 
     def __enter__(self) -> Self:
@@ -130,13 +123,13 @@ class IndexServer:  # ruff:ignore[non-empty-init-module]  # Preserve the origina
         self._server_dir.mkdir(exist_ok=True)
         server_at = str(self._server_dir)
         # 1. create the server
-        cmd = [self._init, "--serverdir", server_at]
+        cmd = [self._exe("devpi-init"), "--serverdir", server_at]
         cmd.extend(("--role", "standalone", "--root-passwd", self._passwd))
         if self._with_root_pypi is False:
             cmd.append("--no-root-pypi")
         _check_call(cmd)
         # 2. start the server
-        cmd = [self._server, "--serverdir", server_at, "--port", str(self.port)]
+        cmd = [self._exe("devpi-server"), "--serverdir", server_at, "--port", str(self.port)]
         cmd.extend(self._start_args)
         self._process = Popen(cmd, stdout=PIPE, universal_newlines=True)  # ruff:ignore[subprocess-without-shell-equals-true]  # no shell, argument list only
         stdout = self._drain_stdout()
@@ -155,6 +148,9 @@ class IndexServer:  # ruff:ignore[non-empty-init-module]  # Preserve the origina
             msg = f"devpi server at {self._server_dir} exited before it was ready"
             raise RuntimeError(msg)
 
+    def _exe(self, name: str) -> str:
+        return str(self._scripts / f"{name}{'.exe' if sys.platform == 'win32' else ''}")
+
     def _drain_stdout(self) -> Iterator[str]:
         process = cast("Popen[str]", self._process)
         stdout = cast("IO[str]", process.stdout)
@@ -167,8 +163,8 @@ class IndexServer:  # ruff:ignore[non-empty-init-module]  # Preserve the origina
     def _setup_client(self) -> None:
         self._client_dir.mkdir(exist_ok=True)
         base = ["--clientdir", str(self._client_dir)]
-        _check_call([self._client, "use", *base, self.url])
-        _check_call([self._client, "login", *base, self.user, "--password", self._passwd])
+        _check_call([self._exe("devpi"), "use", *base, self.url])
+        _check_call([self._exe("devpi"), "login", *base, self.user, "--password", self._passwd])
 
     @property
     def url(self) -> str:
@@ -214,7 +210,7 @@ class IndexServer:  # ruff:ignore[non-empty-init-module]  # Preserve the origina
         if name in self._indexes:
             msg = f"index {name} already exists"
             raise ValueError(msg)
-        base = [self._client, "--clientdir", str(self._client_dir)]
+        base = [self._exe("devpi"), "--clientdir", str(self._client_dir)]
         _check_call([*base, "index", "-c", name, *args])
         index = Index(f"{self.url}/{self.user}", name, self.user, base)
         self._indexes[name] = index
