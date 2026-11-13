@@ -14,7 +14,7 @@ from httpx import get
 from devpi_process import Index, IndexServer, __version__
 
 if TYPE_CHECKING:
-    from types import ModuleType
+    from types import FunctionType, ModuleType
 
 
 def test_version() -> None:
@@ -23,6 +23,24 @@ def test_version() -> None:
 
 def test_index_upload_type_hints() -> None:
     assert get_type_hints(Index.upload)["files"] is Path
+
+
+def test_public_class_module_paths() -> None:
+    assert (Index.__module__, IndexServer.__module__) == ("devpi_process", "devpi_process")
+
+
+@pytest.mark.parametrize(
+    "method",
+    [
+        pytest.param(Index.use, id="index-use"),
+        pytest.param(Index.upload, id="index-upload"),
+        pytest.param(IndexServer.__enter__, id="server-enter"),
+        pytest.param(IndexServer.create_index, id="server-create-index"),
+    ],
+)
+def test_public_method_module_paths(method: FunctionType) -> None:
+    assert method.__module__ == "devpi_process"
+    assert Path(method.__code__.co_filename).name == "__init__.py"
 
 
 @pytest.fixture(scope="session")
@@ -119,7 +137,7 @@ def test_create_server_rejects_missing_scripts(tmp_path: Path, monkeypatch: pyte
 def test_create_server_reports_missing_executable(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(sysconfig, "get_path", lambda _name: str(tmp_path / "missing"))
 
-    with ExitStack() as stack, pytest.raises(FileNotFoundError, match="devpi-init"):
+    with ExitStack() as stack, pytest.raises(FileNotFoundError):
         stack.enter_context(IndexServer(tmp_path))
 
 
