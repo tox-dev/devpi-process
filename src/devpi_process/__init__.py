@@ -1,4 +1,4 @@
-"""Devpi PyPI to test with."""
+"""Devpi PyPI to test with."""  # simplint: ignore[unused-dependency]  # Provide the devpi commands it runs.
 
 from __future__ import annotations
 
