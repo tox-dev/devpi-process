@@ -5,6 +5,7 @@ import tarfile
 from io import BytesIO
 from pathlib import Path
 from textwrap import dedent
+from types import MappingProxyType
 from typing import Final
 from zipfile import ZipFile
 
@@ -17,7 +18,7 @@ _LOGIC: Final[str] = f"{_NAME}/__init__.py"
 _METADATA: Final[str] = f"{_DIST_INFO}/METADATA"
 _WHEEL: Final[str] = f"{_DIST_INFO}/WHEEL"
 _RECORD: Final[str] = f"{_DIST_INFO}/RECORD"
-_CONTENT: Final[dict[str, str]] = {
+_CONTENT: Final[MappingProxyType[str, str]] = MappingProxyType({
     _LOGIC: f"def do():\n    print('greetings from {_NAME}')",
     _METADATA: f"""
         Metadata-Version: 2.1
@@ -46,7 +47,7 @@ _CONTENT: Final[dict[str, str]] = {
         {_DIST_INFO}/top_level.txt,,
         {_DIST_INFO}/RECORD,,
        """,
-}
+})
 
 
 def build_wheel(
