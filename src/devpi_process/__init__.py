@@ -2,17 +2,17 @@
 
 from __future__ import annotations
 
-import secrets  # simplint: ignore[init-module-content]  # Public classes are defined here.
-import socket  # simplint: ignore[init-module-content]  # Public classes are defined here.
-import string  # simplint: ignore[init-module-content]  # Public classes are defined here.
-import sys  # simplint: ignore[init-module-content]  # Public classes are defined here.
-import sysconfig  # simplint: ignore[init-module-content]  # Public classes are defined here.
-from contextlib import closing  # simplint: ignore[init-module-content]  # Public classes are defined here.
-from logging import getLogger  # simplint: ignore[init-module-content]  # Public classes are defined here.
-from pathlib import Path  # simplint: ignore[init-module-content]  # Public classes are defined here.
-from subprocess import PIPE, Popen, run  # ruff:ignore[suspicious-subprocess-import]  # simplint: ignore[init-module-content]  # Public classes are defined here.
-from threading import Thread  # simplint: ignore[init-module-content]  # Public classes are defined here.
-from typing import IO, TYPE_CHECKING, cast  # simplint: ignore[init-module-content]  # Public classes are defined here.
+import secrets
+import socket
+import string
+import sys
+import sysconfig
+from contextlib import closing
+from logging import getLogger
+from pathlib import Path
+from subprocess import PIPE, Popen, run  # ruff:ignore[suspicious-subprocess-import]  # runs the devpi executables
+from threading import Thread
+from typing import IO, TYPE_CHECKING, cast
 
 from ._version import __version__
 
