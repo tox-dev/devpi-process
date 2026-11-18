@@ -2,6 +2,19 @@
 
 from __future__ import annotations
 
+__lazy_modules__ = [
+    "contextlib",
+    "logging",
+    "pathlib",
+    "secrets",
+    "socket",
+    "string",
+    "subprocess",
+    "sysconfig",
+    "threading",
+    f"{__spec__.parent}._version",  # ty: ignore[missing-union-attribute]  # imported modules have a spec
+]
+
 import secrets
 import socket
 import string
