@@ -2,6 +2,28 @@
 
 <!-- towncrier release notes start -->
 
+<a name="release-1-3-4"></a>
+
+## 1.3.4 (2026-11-18)
+
+<a name="release-1-3-4-fixed"></a>
+
+### Fixed
+
+- Report an error when devpi exits before it is ready, and clean up the child process if startup fails
+  ([#319](https://github.com/tox-dev/devpi-process/pull/319)) by [@gaborbernat](https://github.com/gaborbernat).
+- Restore `Index` and `IndexServer` definitions to `devpi_process` so their classes and methods retain their original
+  module and source paths ([#321](https://github.com/tox-dev/devpi-process/pull/321)) by
+  [@gaborbernat](https://github.com/gaborbernat).
+
+<a name="release-1-3-4-packaging"></a>
+
+### Packaging
+
+- Every wheel now carries a [PEP 770](https://peps.python.org/pep-0770/) CycloneDX SBOM in its `.dist-info/sboms`
+  directory, written at build time by [python-sbom](https://github.com/tox-dev/python-sbom)
+  ([#317](https://github.com/tox-dev/devpi-process/pull/317)) by [@gaborbernat](https://github.com/gaborbernat).
+
 <a name="release-1-3-3"></a>
 
 ## 1.3.3 (2026-11-04)
